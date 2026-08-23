@@ -1,260 +1,198 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Launch X</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root{--bg:#0b0f14;--card:#111827;--muted:#94a3b8;--text:#e5e7eb;--brand:#3b82f6;--brand2:#22c55e;--warn:#f59e0b;--red:#ef4444;--purple:#7c3aed;--wa:#25D366}
-    *{box-sizing:border-box}body{margin:0;font-family:system-ui;background:linear-gradient(180deg,#0b0f14,#0a0a0a);color:var(--text)}
-   .container{max-width:900px;margin:0 auto;padding:24px}
-   .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:20px;margin-bottom:16px}
-    h1{font-size:28px;margin:0 0 8px} p{color:var(--muted);margin:0 0 16px}
-   .btn{padding:18px;border-radius:16px;border:1px solid #243244;background:#0f172a;color:#fff;font-weight:700;cursor:pointer;width:100%;margin-bottom:12px;font-size:16px}
-   .btn:hover{background:#1e293b;transform:translateY(-2px)}
-   .btn.brand{background:var(--brand)}.btn.green{background:var(--brand2)}.btn.red{background:var(--red)}.btn.yellow{background:var(--warn);color:#111}.btn.purple{background:var(--purple)}
-   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-   .field{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
-   .field input{padding:12px;border-radius:10px;border:1px solid #243244;background:#0b1220;color:#fff;width:100%}
-   .hidden{display:none}.header{display:flex;justify-content:space-between;align-items:center}
-   .btn-logout{padding:10px 16px;font-size:14px;width:auto;background:#ef4444}
-   .balance-box{background:linear-gradient(135deg,#3b82f6,#22c55e);padding:20px;border-radius:12px;text-align:center;margin-bottom:16px}
-   .balance-amount{font-size:36px;font-weight:900;color:#fff}
-   .user-card{background:#0b1220;padding:12px;border-radius:10px;margin:10px 0;border:1px solid #243244}
-   .warn-note{color:#f59e0b;background:#1e293b;padding:10px;border-radius:8px;margin-bottom:12px}
-   .wa-box{background:#25D366;padding:14px;border-radius:10px;text-align:center;margin-top:16px}
-   .deposit-box{background:linear-gradient(135deg,#f59e0b,#ef4444);padding:20px;border-radius:12px;text-align:center;margin-bottom:16px}
-   .ref-box{background:#0b1220;padding:14px;border-radius:10px;margin-top:16px;border:1px dashed #3b82f6}
+    body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+   .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+   .tab-active { background: #06b6d4!important; }
   </style>
 </head>
-<body>
-  <div class="container">
-    <!-- HOME -->
-    <section id="home" class="card">
-      <h1>Welcome to <span style="color:#3b82f6">Launch X</span></h1>
-      <p>Entry Fee: 300 PKR - Manual Approval</p>
-      <button class="btn green" id="toRegister">Create Account</button>
-      <button class="btn brand" id="toLogin">Login</button>
-      <button class="btn purple" id="toAdmin">🔐 Admin Panel</button>
-      <div class="wa-box">
-        <b>Need Help?</b><br>
-        <a href="https://wa.me/923316035482" target="_blank" style="color:#fff;text-decoration:none;font-weight:700">WhatsApp Support: 0331 6035482</a>
+<body class="min-h-screen">
+
+  <!-- HEADER -->
+  <div class="p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-cyan-400">Launch X</h1>
+    <div class="flex gap-2">
+      <button onclick="showAdmin()" class="px-4 py-2 bg-purple-600 rounded-lg">Admin Panel</button>
+      <a href="https://wa.me/923316035482" target="_blank" class="px-4 py-2 bg-green-600 rounded-lg">WhatsApp</a>
+    </div>
+  </div>
+
+  <!-- AUTH PAGE -->
+  <div id="authPage" class="flex items-center justify-center p-4">
+    <div class="glass rounded-2xl p-8 w-full max-w-md">
+      <div class="flex gap-2 mb-6">
+        <button onclick="showLogin()" id="loginTab" class="flex-1 py-2 rounded-lg bg-slate-700">Login</button>
+        <button onclick="showRegister()" id="registerTab" class="flex-1 py-2 rounded-lg bg-slate-700 tab-active">Create Account</button>
       </div>
-    </section>
 
-    <!-- REGISTER -->
-    <section id="register" class="card hidden">
-      <h1>Create Account</h1>
-      <form id="regForm">
-        <div class="field"><label>Full Name</label><input name="name" required/></div>
-        <div class="field"><label>Email</label><input name="email" type="email" required/></div>
-        <div class="field"><label>Phone</label><input name="number" type="tel" required/></div>
-        <div class="field"><label>Referral Email</label><input name="referral" placeholder="Optional"/></div>
-        <div class="field"><label>Password</label><input name="password" type="password" required/></div>
-        <button class="btn green" type="submit">Sign Up</button>
+      <form id="registerForm" onsubmit="registerUser(event)">
+        <input id="regName" type="text" placeholder="Full Name" required class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+        <input id="regEmail" type="email" placeholder="Email" required class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+        <input id="regNumber" type="text" placeholder="Phone Number" required class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+        <input id="regPass" type="password" placeholder="Password" required class="w-full p-3 mb-4 rounded-lg bg-slate-800">
+        <button type="submit" class="w-full py-3 bg-cyan-600 rounded-lg font-bold">Submit</button>
       </form>
-      <button class="btn" id="backHome1">← Back</button>
-    </section>
 
-    <!-- LOGIN -->
-    <section id="login" class="card hidden">
-      <h1>Login</h1>
-      <form id="loginForm">
-        <div class="field"><label>Email</label><input name="email" type="email" required/></div>
-        <div class="field"><label>Password</label><input name="password" type="password" required/></div>
-        <button class="btn brand" type="submit">Login</button>
+      <form id="loginForm" onsubmit="loginUser(event)" class="hidden">
+        <input id="loginEmail" type="email" placeholder="Email" required class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+        <input id="loginPass" type="password" placeholder="Password" required class="w-full p-3 mb-4 rounded-lg bg-slate-800">
+        <button type="submit" class="w-full py-3 bg-cyan-600 rounded-lg font-bold">Login</button>
       </form>
-      <button class="btn" id="backHome2">← Back</button>
-    </section>
+      <p id="authMessage" class="text-center mt-4 text-sm"></p>
+    </div>
+  </div>
 
-    <!-- DEPOSIT -->
-    <section id="deposit" class="card hidden">
-      <h1>Entry Fee: 300 PKR</h1>
-      <div class="deposit-box"><div class="balance-amount">300 PKR</div></div>
-      <p class="warn-note">Easypaisa: 03368881011 - Abdul Rehan</p>
-      <form id="depositForm">
-        <div class="field"><label>Transaction ID</label><input name="txid" required/></div>
-        <button class="btn green" type="submit">I Have Deposited</button>
-      </form>
-    </section>
+  <!-- DEPOSIT PAGE -->
+  <div id="depositPage" class="hidden p-4 max-w-md mx-auto">
+    <div class="glass rounded-2xl p-6">
+      <h2 class="text-xl font-bold mb-2">Entry Fee: 300 PKR</h2>
+      <div class="bg-orange-500 p-4 rounded-lg text-center text-2xl font-bold mb-4">300 PKR</div>
+      <p class="text-orange-400 mb-2">Easypaisa: 03368881011 - Abdul Rehan</p>
+      
+      <label class="text-sm">Transaction ID</label>
+      <input id="depositTx" type="text" placeholder="Enter TX ID" required class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+      
+      <button onclick="submitDeposit()" class="w-full py-3 bg-green-600 rounded-lg font-bold">I Have Deposited</button>
+      <p id="depositMsg" class="text-center mt-3 text-yellow-400"></p>
+      <button onclick="showDashboard()" class="w-full py-2 mt-3 bg-slate-700 rounded-lg">Back</button>
+    </div>
+  </div>
 
-    <!-- PENDING -->
-    <section id="pending" class="card hidden">
-      <h1>Approval Pending</h1>
-      <p class="warn-note">Admin approval ka wait karein. Koi masla ho to WhatsApp karein: 0331 6035482</p>
-    </section>
+  <!-- DASHBOARD PAGE -->
+  <div id="dashboardPage" class="hidden p-4 max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">Welcome, <span id="userName"></span></h1>
+      <button onclick="logout()" class="px-4 py-2 bg-red-600 rounded-lg">Logout</button>
+    </div>
+    
+    <div class="glass rounded-2xl p-6 mb-4 text-center">
+      <p class="text-slate-400">Your Balance</p>
+      <p class="text-4xl font-bold text-green-400">PKR <span id="userBalance">0</span></p>
+    </div>
 
-    <!-- DASHBOARD -->
-    <section id="dashboard" class="card hidden">
-      <div class="header"><h1>Dashboard</h1><button class="btn-logout" id="logoutBtn">LOGOUT</button></div>
-      <p>Welcome: <b><span id="userName"></span></b></p>
-      <div class="balance-box"><div>Your Balance $</div><div class="balance-amount" id="balance">$0.00</div></div>
-      <div class="grid-2">
-        <button class="btn brand" id="watchVideo">WATCH VIDEO</button>
-        <button class="btn green" id="inviteFriend">INVITE FRIEND</button>
-        <button class="btn yellow" id="addEarn">ADD EARN</button>
-        <button class="btn red" id="withdrawBtn">WITHDRAW</button>
-      </div>
-      <div class="ref-box hidden" id="refBox">
-        <h3>Your Referral Link</h3>
-        <input id="refLink" readonly style="width:100%;padding:10px;background:#111;color:#fff;border:1px solid #333;border-radius:8px"/>
-        <p class="warn-note">Har referral par $0.25 milega</p>
-      </div>
-    </section>
+    <div class="grid grid-cols-2 gap-4">
+      <button class="glass p-4 rounded-xl font-bold">Watch Video</button>
+      <button class="glass p-4 rounded-xl font-bold">Invite Friend - 70 PKR</button>
+      <button onclick="showDeposit()" class="glass p-4 rounded-xl font-bold">Add Funds 300 PKR</button>
+      <button class="glass p-4 rounded-xl font-bold">Withdrawal 0.5$</button>
+    </div>
+  </div>
 
-    <!-- ADMIN -->
-    <section id="admin" class="card hidden">
-      <h1>🔐 Admin Panel</h1>
-      <h3>📥 Pending Deposits</h3>
-      <div id="pendingList"></div>
-      <h3 style="margin-top:20px">👥 All Users</h3>
-      <div id="usersList"></div>
-      <button class="btn" id="backHomeAdmin">← Back</button>
-    </section>
+  <!-- ADMIN PANEL -->
+  <div id="adminPage" class="hidden p-4 max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-purple-400">Admin Panel</h1>
+      <button onclick="showDashboard()" class="px-4 py-2 bg-slate-700 rounded-lg">Back</button>
+    </div>
+    <div id="pendingList" class="glass rounded-2xl p-6">
+      <h2 class="text-xl mb-4">Pending Deposit Requests</h2>
+      <div id="requestList">No Pending Requests</div>
+    </div>
   </div>
 
 <script>
-  const $ = id => document.getElementById(id);
-  const REF_REWARD = 0.25;
-  const SITE_URL = window.location.origin;
+  const SUPABASE_URL = 'https://bvgmcrqenrqtaedbaqav.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_4V777hQQNT5kYx6nCmR7Sw_vqH9B3QO';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let currentUser = null;
 
-  // Local Storage Helpers
-  const getUsers = () => JSON.parse(localStorage.getItem('launchx_users') || '[]');
-  const saveUsers = u => localStorage.setItem('launchx_users', JSON.stringify(u));
-  const getPending = () => JSON.parse(localStorage.getItem('launchx_pending') || '[]');
-  const savePending = p => localStorage.setItem('launchx_pending', JSON.stringify(p));
-  const getSession = () => JSON.parse(localStorage.getItem('launchx_session') || 'null');
-  const setSession = s => localStorage.setItem('launchx_session', JSON.stringify(s));
-  const clearSession = () => localStorage.removeItem('launchx_session');
+  // Load users from localStorage if not in supabase
+  function getUsers() { return JSON.parse(localStorage.getItem('users')) || []; }
+  function saveUsers(users) { localStorage.setItem('users', JSON.stringify(users)); }
+  function getRequests() { return JSON.parse(localStorage.getItem('requests')) || []; }
+  function saveRequests(reqs) { localStorage.setItem('requests', JSON.stringify(reqs)); }
 
-  let currentUser = getSession();
+  function showLogin() { toggleForms('login'); }
+  function showRegister() { toggleForms('register'); }
+  function toggleForms(active) {
+    loginForm.classList.toggle('hidden', active!== 'login');
+    registerForm.classList.toggle('hidden', active!== 'register');
+    loginTab.classList.toggle('tab-active', active === 'login');
+    registerTab.classList.toggle('tab-active', active === 'register');
+  }
 
-  function show(id){ ['home','register','login','deposit','pending','dashboard','admin'].forEach(s => $(s).classList.add('hidden')); $(id).classList.remove('hidden'); }
-
-  // BUTTONS
-  $('toRegister').onclick = () => show('register');
-  $('toLogin').onclick = () => show('login');
-  $('backHome1').onclick = () => show('home');
-  $('backHome2').onclick = () => show('home');
-  $('backHomeAdmin').onclick = () => show('home');
-  $('logoutBtn').onclick = () => { clearSession(); currentUser = null; show('home'); }
-  $('inviteFriend').onclick = () => { $('refBox').classList.toggle('hidden'); }
-
-  // REGISTER
-  $('regForm').onsubmit = e => {
+  async function registerUser(e) {
     e.preventDefault();
-    const users = getUsers();
-    const email = $('regForm').email.value;
-    if(users.find(u => u.email === email)){ alert("Email already exists!"); return; }
-
-    const newUser = {
-      name: $('regForm').name.value,
-      email: email,
-      number: $('regForm').number.value,
-      password: $('regForm').password.value,
-      referred_by: $('regForm').referral.value,
-      balance: 0,
-      is_active: false
-    };
-
-    users.push(newUser);
+    let users = getUsers();
+    users.push({name: regName.value, email: regEmail.value, number: regNumber.value, password: regPass.value, balance: 0});
     saveUsers(users);
-
-    // Referral Reward
-    if(newUser.referred_by){
-      const refUser = users.find(u => u.email === newUser.referred_by);
-      if(refUser){ refUser.balance += REF_REWARD; saveUsers(users); }
-    }
-
-    alert("Account ban gaya! Ab 300 deposit karein");
-    show('deposit');
+    authMessage.innerText = 'Account Created! ✅ Now Login';
+    authMessage.className = 'text-green-400';
+    registerForm.reset();
   }
 
-  // LOGIN
-  $('loginForm').onsubmit = e => {
+  async function loginUser(e) {
     e.preventDefault();
-    const users = getUsers();
-    const user = users.find(u => u.email === $('loginForm').email.value && u.password === $('loginForm').password.value);
-    if(user){
-      currentUser = user;
-      setSession(user);
-      if(!user.is_active){ show('pending'); }
-      else {
-        $('userName').textContent = user.name;
-        $('balance').textContent = '$' + user.balance;
-        $('refLink').value = SITE_URL + "?ref=" + user.email;
-        show('dashboard');
-      }
-    } else { alert("Wrong Email or Password!"); }
+    let users = getUsers();
+    let user = users.find(u => u.email === loginEmail.value && u.password === loginPass.value);
+    if(user) { currentUser = user; showDashboard(); } 
+    else { authMessage.innerText = 'Invalid Email or Password'; authMessage.className = 'text-red-400'; }
   }
 
-  // DEPOSIT
-  $('depositForm').onsubmit = e => {
-    e.preventDefault();
-    const pending = getPending();
-    pending.push({ user_email: currentUser.email, tx_id: $('depositForm').txid.value, amount: 300 });
-    savePending(pending);
-    alert("Request sent! Admin approval ka wait karein");
-    show('pending');
+  function showDashboard() {
+    authPage.classList.add('hidden'); depositPage.classList.add('hidden'); adminPage.classList.add('hidden');
+    dashboardPage.classList.remove('hidden');
+    userName.innerText = currentUser.name; userBalance.innerText = currentUser.balance;
+  }
+  function showDeposit() {
+    authPage.classList.add('hidden'); dashboardPage.classList.add('hidden'); adminPage.classList.add('hidden');
+    depositPage.classList.remove('hidden'); depositMsg.innerText = '';
+  }
+  function logout() { currentUser = null; dashboardPage.classList.add('hidden'); depositPage.classList.add('hidden'); adminPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
+
+  function submitDeposit() {
+    if(!depositTx.value) return alert('Enter Transaction ID');
+    let reqs = getRequests();
+    reqs.push({email: currentUser.email, name: currentUser.name, amount: 300, tx: depositTx.value, status: 'pending'});
+    saveRequests(reqs);
+    depositMsg.innerText = '✅ Request Sent - Waiting for Admin Approval';
+    depositTx.value = '';
   }
 
-  // ADMIN LOGIN
-  $('toAdmin').onclick = () => {
-    const email = prompt('Admin Email:');
-    const pass = prompt('Admin Password:');
-    if(email === 'admin@launchx.com' && pass === 'admin123'){
-      loadAdmin();
-      show('admin');
-    } else { alert('Wrong Email or Password!'); }
+  function showAdmin() {
+    authPage.classList.add('hidden'); dashboardPage.classList.add('hidden'); depositPage.classList.add('hidden');
+    adminPage.classList.remove('hidden');
+    loadRequests();
   }
 
-  function loadAdmin(){
-    const pending = getPending();
+  function loadRequests() {
+    let reqs = getRequests().filter(r => r.status === 'pending');
     let html = '';
-    pending.forEach((p, i) => {
-      html += `<div class="user-card">
-        <b>Email:</b> ${p.user_email}<br>
-        <b>TX ID:</b> ${p.tx_id}<br>
-        <b>Amount:</b> ${p.amount}<br>
-        <button class="btn green" onclick="approveUser(${i})">Approve 300</button>
+    if(reqs.length === 0) html = 'No Pending Requests';
+    reqs.forEach((r, i) => {
+      html += `<div class="glass p-3 mb-3 rounded-lg">
+        <p><b>Name:</b> ${r.name}</p>
+        <p><b>Email:</b> ${r.email}</p>
+        <p><b>Amount:</b> ${r.amount} PKR</p>
+        <p><b>TX ID:</b> ${r.tx}</p>
+        <button onclick="approve(${i})" class="mt-2 px-4 py-2 bg-green-600 rounded-lg">Approve</button>
       </div>`;
     });
-    $('pendingList').innerHTML = html || '<p>No pending requests</p>';
-
-    const users = getUsers();
-    let usersHtml = '';
-    users.forEach(u => {
-      usersHtml += `<div class="user-card"><b>${u.name}</b><br>Email: ${u.email}<br>Phone: ${u.number}<br>Balance: $${u.balance}<br>Status: ${u.is_active? 'Active ✅' : 'Pending ❌'}</div>`;
-    });
-    $('usersList').innerHTML = usersHtml;
+    requestList.innerHTML = html;
   }
 
-  // APPROVE FUNCTION
-  window.approveUser = (index) => {
-    const pending = getPending();
-    const users = getUsers();
-    const p = pending[index];
-    const user = users.find(u => u.email === p.user_email);
-    if(user){ user.balance = 300; user.is_active = true; }
-    pending.splice(index, 1);
-    saveUsers(users); savePending(pending);
-    alert(p.user_email + " Approved!");
-    loadAdmin();
-  }
+  function approve(index) {
+    let reqs = getRequests();
+    let req = reqs[index];
+    
+    // Add balance to user
+    let users = getUsers();
+    let user = users.find(u => u.email === req.email);
+    if(user) user.balance += req.amount;
+    saveUsers(users);
 
-  // DASHBOARD BUTTONS
-  $('watchVideo').onclick = () => alert('Watch Video - Coming Soon');
-  $('addEarn').onclick = () => alert('Add Earn - Coming Soon');
-  $('withdrawBtn').onclick = () => alert('Withdraw - Coming Soon');
-
-  // Auto login if session exists
-  if(currentUser){
-    if(currentUser.is_active){
-      $('userName').textContent = currentUser.name;
-      $('balance').textContent = '$' + currentUser.balance;
-      $('refLink').value = SITE_URL + "?ref=" + currentUser.email;
-      show('dashboard');
-    } else { show('pending'); }
+    // Remove request
+    reqs.splice(index, 1);
+    saveRequests(reqs);
+    
+    alert('Approved! Balance Added');
+    loadRequests();
   }
 </script>
 </body>
