@@ -9,8 +9,9 @@
     body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
   .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
   .tab-active { background: #06b6d4!important; }
-  .pic-box { width: 60px; height: 60px; background: #334155; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; font-size: 24px; }
-  .pic-box.rated { border: 2px solid #22c55e; background: #16a34a; }
+  .pic-card { background: #1e293b; padding: 10px; border-radius: 10px; text-align: center; }
+  .star { font-size: 20px; cursor: pointer; color: #475569; }
+  .star.active { color: #facc15; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -28,13 +29,11 @@
         <button type="button" onclick="showLogin()" id="loginTab" class="flex-1 py-2 rounded-lg bg-slate-700 tab-active">Login</button>
         <button type="button" onclick="showRegister()" id="registerTab" class="flex-1 py-2 rounded-lg bg-slate-700">Create Account</button>
       </div>
-
       <div id="loginForm">
         <input id="loginEmail" type="email" placeholder="Email" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
         <input id="loginPass" type="password" placeholder="Password" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
         <button type="button" onclick="loginUser()" class="w-full py-3 bg-cyan-600 rounded-lg font-bold">Login</button>
       </div>
-
       <div id="registerForm" class="hidden">
         <input id="regName" type="text" placeholder="Full Name" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
         <input id="regEmail" type="email" placeholder="Email" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
@@ -52,12 +51,10 @@
       <h1 class="text-2xl font-bold">Welcome, <span id="userName"></span></h1>
       <button onclick="logout()" class="px-4 py-2 bg-red-600 rounded-lg">Logout</button>
     </div>
-    
     <div class="glass rounded-2xl p-6 mb-4 text-center">
       <p class="text-slate-400">Your Balance $</p>
       <p class="text-4xl font-bold text-green-400">$<span id="userBalance">0.00</span></p>
     </div>
-
     <div class="grid grid-cols-2 gap-4">
       <button onclick="alert('Coming Soon')" class="p-4 rounded-xl font-bold bg-yellow-600">ADD EARN</button>
       <button onclick="showTask()" class="p-4 rounded-xl font-bold bg-blue-600">COMPLETE TASK</button>
@@ -67,12 +64,12 @@
     </div>
   </div>
 
-  <!-- TASK PAGE -->
-  <div id="taskPage" class="hidden p-4 max-w-md mx-auto">
+  <!-- TASK PAGE - 10 PICS WITH 5 STARS -->
+  <div id="taskPage" class="hidden p-4 max-w-2xl mx-auto">
     <div class="glass rounded-2xl p-6">
       <h2 class="text-xl font-bold mb-2">Daily Task - Rate 10 Pics</h2>
       <p class="text-sm mb-4">1 Pic = $0.001 | Total 10 Pics = $0.01</p>
-      <div id="picGrid" class="grid grid-cols-5 gap-3 mb-4"></div>
+      <div id="picGrid" class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4"></div>
       <button id="claimBtn" onclick="claimTask()" class="w-full py-3 bg-green-600 rounded-lg font-bold">Claim $0.01</button>
       <button onclick="showDashboard()" class="w-full py-2 mt-3 bg-slate-700 rounded-lg">Back</button>
       <p id="taskMsg" class="text-center mt-3 text-yellow-400"></p>
@@ -97,7 +94,8 @@
     <div class="glass rounded-2xl p-6">
       <h2 class="text-xl font-bold mb-2">Withdraw</h2>
       <p class="text-sm mb-4">Minimum Withdraw: $0.5</p>
-      <input id="withdrawNum" type="text" placeholder="Easypaisa Number" value="03316035482" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+      <input id="withdrawMethod" type="text" placeholder="Method: JazzCash / Easypaisa" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+      <input id="withdrawNum" type="text" placeholder="Your Number" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
       <input id="withdrawAmount" type="number" placeholder="Amount $" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
       <button onclick="requestWithdraw()" class="w-full py-3 bg-red-600 rounded-lg font-bold mb-3">Request Withdraw</button>
       <button onclick="showDashboard()" class="w-full py-2 bg-slate-700 rounded-lg">Back</button>
@@ -112,15 +110,19 @@
     </div>
     <div class="glass rounded-2xl p-6 mb-4">
       <h2 class="text-xl mb-3">YouTube Link Settings</h2>
-      <input id="ytLink" type="text" placeholder="Paste Your YouTube Channel Link Here" value="https://youtube.com/@abakKhan-w8k" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+      <input id="ytLink" type="text" value="https://youtube.com/@abakKhan-w8k" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
       <button onclick="saveYT()" class="px-4 py-2 bg-green-600 rounded-lg">Save Link</button>
-      <p id="ytMsg" class="text-sm mt-2"></p>
+    </div>
+    <div class="glass rounded-2xl p-6">
+      <h2 class="text-xl mb-3">Activate User Account</h2>
+      <input id="activateEmail" type="email" placeholder="User Email" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+      <button onclick="activateUser()" class="px-4 py-2 bg-green-600 rounded-lg">Activate</button>
+      <p id="adminMsg" class="text-sm mt-2"></p>
     </div>
   </div>
 
 <script>
   let currentUser = null;
-
   function getUsers() { return JSON.parse(localStorage.getItem('users')) || []; }
   function saveUsers(users) { localStorage.setItem('users', JSON.stringify(users)); }
   function getData(key) { return JSON.parse(localStorage.getItem(key)) || {}; }
@@ -133,44 +135,45 @@
   function registerUser() {
     let users = getUsers();
     if(!regName.value ||!regEmail.value ||!regPass.value) { authMessage.innerText = 'Please fill all fields'; authMessage.className = 'text-red-400'; return; }
-    users.push({name: regName.value, email: regEmail.value, number: regNumber.value, password: regPass.value, balance: 0.00}); // ZERO BALANCE
+    users.push({name: regName.value, email: regEmail.value, number: regNumber.value, password: regPass.value, balance: 0.00, active: false}); // ZERO + NOT ACTIVE
     saveUsers(users);
-    authMessage.innerText = 'Account Created! ✅ Now Login'; authMessage.className = 'text-green-400';
-    registerForm.reset();
+    authMessage.innerText = 'Account Created! ✅ Wait for Admin Activation'; authMessage.className = 'text-green-400';
   }
 
   function loginUser() {
     let users = getUsers();
     let user = users.find(u => u.email === loginEmail.value && u.password === loginPass.value);
-    if(user) { currentUser = user; showDashboard(); } 
-    else { authMessage.innerText = 'Invalid Email or Password'; authMessage.className = 'text-red-400'; }
+    if(!user) { authMessage.innerText = 'Invalid Email or Password'; authMessage.className = 'text-red-400'; return; }
+    if(!user.active) { authMessage.innerText = 'Account Not Activated by Admin'; authMessage.className = 'text-red-400'; return; }
+    currentUser = user; showDashboard();
   }
 
-  function showDashboard() {
-    authPage.classList.add('hidden'); taskPage.classList.add('hidden'); videoPage.classList.add('hidden'); withdrawPage.classList.add('hidden'); adminPage.classList.add('hidden');
-    dashboardPage.classList.remove('hidden');
-    userName.innerText = currentUser.name; userBalance.innerText = currentUser.balance.toFixed(2);
-  }
+  function showDashboard() { authPage.classList.add('hidden'); taskPage.classList.add('hidden'); videoPage.classList.add('hidden'); withdrawPage.classList.add('hidden'); adminPage.classList.add('hidden'); dashboardPage.classList.remove('hidden'); userName.innerText = currentUser.name; userBalance.innerText = currentUser.balance.toFixed(2); }
   function logout() { currentUser = null; dashboardPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
 
-  // TASK - 10 STARS
+  // TASK - 10 PICS x 5 STARS
   function showTask() {
     dashboardPage.classList.add('hidden'); taskPage.classList.remove('hidden');
     let today = new Date().toDateString();
     let claims = getData('taskClaims');
-    if(claims[currentUser.email] === today) {
-      taskMsg.innerText = '⚠️ You already claimed today. Come back tomorrow.';
-      claimBtn.disabled = true; claimBtn.classList.add('opacity-50');
-    } else { taskMsg.innerText = ''; claimBtn.disabled = false; claimBtn.classList.remove('opacity-50'); }
+    if(claims[currentUser.email] === today) { taskMsg.innerText = '⚠️ You already claimed today'; claimBtn.disabled = true; claimBtn.classList.add('opacity-50'); } 
+    else { taskMsg.innerText = ''; claimBtn.disabled = false; claimBtn.classList.remove('opacity-50'); }
     
     picGrid.innerHTML = '';
     for(let i=1; i<=10; i++) {
-      picGrid.innerHTML += `<div class="pic-box" onclick="this.classList.toggle('rated')">⭐</div>`;
+      let stars = '';
+      for(let s=1; s<=5; s++) stars += `<span class="star" onclick="rateStar(${i},${s})">★</span>`;
+      picGrid.innerHTML += `<div class="pic-card"><p>Pic ${i}</p><div id="stars-${i}">${stars}</div></div>`;
     }
   }
+  function rateStar(pic, star) {
+    let stars = document.querySelectorAll(`#stars-${pic} .star`);
+    stars.forEach((s, i) => s.classList.toggle('active', i < star));
+  }
   function claimTask() {
-    let rated = document.querySelectorAll('.pic-box.rated').length;
-    if(rated < 10) return alert('Please rate all 10 pictures first');
+    let rated = 0;
+    for(let i=1; i<=10; i++) { if(document.querySelectorAll(`#stars-${i} .star.active`).length === 5) rated++; }
+    if(rated < 10) return alert('Please give 5 stars to all 10 pictures');
     let users = getUsers();
     let user = users.find(u => u.email === currentUser.email);
     user.balance += 0.01;
@@ -182,7 +185,7 @@
     showDashboard();
   }
 
-  // VIDEO - $0.05
+  // VIDEO
   function showVideo() { dashboardPage.classList.add('hidden'); videoPage.classList.remove('hidden'); videoMsg.innerText = ''; }
   function openYT() { window.open(getSetting('ytLink'), '_blank'); }
   function claimVideo() {
@@ -191,7 +194,7 @@
     if(claims[currentUser.email] === today) return videoMsg.innerText = '⚠️ Already claimed today';
     let users = getUsers();
     let user = users.find(u => u.email === currentUser.email);
-    user.balance += 0.05; // $0.05 NOW
+    user.balance += 0.05;
     saveUsers(users);
     claims[currentUser.email] = today;
     saveData('videoClaims', claims);
@@ -202,20 +205,19 @@
   function showWithdraw() { dashboardPage.classList.add('hidden'); withdrawPage.classList.remove('hidden'); }
   function requestWithdraw() {
     if(withdrawAmount.value < 0.5) return alert('Minimum $0.5');
-    alert('Withdraw Request Sent to Admin');
-    withdrawAmount.value = '';
+    if(!withdrawMethod.value || !withdrawNum.value) return alert('Enter Method and Number');
+    alert(`Withdraw Request Sent\nMethod: ${withdrawMethod.value}\nNumber: ${withdrawNum.value}\nAmount: $${withdrawAmount.value}`);
+    withdrawAmount.value = ''; withdrawNum.value = ''; withdrawMethod.value = '';
   }
 
   // ADMIN
-  function showAdmin() {
-    dashboardPage.classList.add('hidden'); authPage.classList.add('hidden');
-    adminPage.classList.remove('hidden');
-    ytLink.value = getSetting('ytLink');
-  }
-  function saveYT() {
-    localStorage.setItem('ytLink', ytLink.value);
-    ytMsg.innerText = '✅ YouTube Link Saved!';
-    ytMsg.className = 'text-green-400';
+  function showAdmin() { dashboardPage.classList.add('hidden'); authPage.classList.add('hidden'); adminPage.classList.remove('hidden'); ytLink.value = getSetting('ytLink'); }
+  function saveYT() { localStorage.setItem('ytLink', ytLink.value); adminMsg.innerText = '✅ YouTube Link Saved!'; adminMsg.className = 'text-green-400'; }
+  function activateUser() {
+    let users = getUsers();
+    let user = users.find(u => u.email === activateEmail.value);
+    if(user) { user.active = true; saveUsers(users); adminMsg.innerText = '✅ User Activated'; adminMsg.className = 'text-green-400'; }
+    else { adminMsg.innerText = '❌ User Not Found'; adminMsg.className = 'text-red-400'; }
   }
 </script>
 </body>
