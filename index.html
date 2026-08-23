@@ -5,11 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Launch X</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
-   .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-   .tab-active { background: #06b6d4!important; }
+  .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+  .tab-active { background: #06b6d4!important; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -27,22 +26,22 @@
   <div id="authPage" class="flex items-center justify-center p-4">
     <div class="glass rounded-2xl p-8 w-full max-w-md">
       <div class="flex gap-2 mb-6">
-        <button onclick="showLogin()" id="loginTab" class="flex-1 py-2 rounded-lg bg-slate-700">Login</button>
-        <button onclick="showRegister()" id="registerTab" class="flex-1 py-2 rounded-lg bg-slate-700 tab-active">Create Account</button>
+        <button type="button" onclick="showLogin()" id="loginTab" class="flex-1 py-2 rounded-lg bg-slate-700">Login</button>
+        <button type="button" onclick="showRegister()" id="registerTab" class="flex-1 py-2 rounded-lg bg-slate-700 tab-active">Create Account</button>
       </div>
 
-      <form id="registerForm" onsubmit="registerUser(event)">
-        <input id="regName" type="text" placeholder="Full Name" required class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-        <input id="regEmail" type="email" placeholder="Email" required class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-        <input id="regNumber" type="text" placeholder="Phone Number" required class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-        <input id="regPass" type="password" placeholder="Password" required class="w-full p-3 mb-4 rounded-lg bg-slate-800">
-        <button type="submit" class="w-full py-3 bg-cyan-600 rounded-lg font-bold">Submit</button>
+      <form id="registerForm">
+        <input id="regName" type="text" placeholder="Full Name" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+        <input id="regEmail" type="email" placeholder="Email" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+        <input id="regNumber" type="text" placeholder="Phone Number" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+        <input id="regPass" type="password" placeholder="Password" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
+        <button type="button" onclick="registerUser()" class="w-full py-3 bg-cyan-600 rounded-lg font-bold">Submit</button>
       </form>
 
-      <form id="loginForm" onsubmit="loginUser(event)" class="hidden">
-        <input id="loginEmail" type="email" placeholder="Email" required class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-        <input id="loginPass" type="password" placeholder="Password" required class="w-full p-3 mb-4 rounded-lg bg-slate-800">
-        <button type="submit" class="w-full py-3 bg-cyan-600 rounded-lg font-bold">Login</button>
+      <form id="loginForm" class="hidden">
+        <input id="loginEmail" type="email" placeholder="Email" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+        <input id="loginPass" type="password" placeholder="Password" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
+        <button type="button" onclick="loginUser()" class="w-full py-3 bg-cyan-600 rounded-lg font-bold">Login</button>
       </form>
       <p id="authMessage" class="text-center mt-4 text-sm"></p>
     </div>
@@ -56,7 +55,7 @@
       <p class="text-orange-400 mb-2">Easypaisa: 03368881011 - Abdul Rehan</p>
       
       <label class="text-sm">Transaction ID</label>
-      <input id="depositTx" type="text" placeholder="Enter TX ID" required class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+      <input id="depositTx" type="text" placeholder="Enter TX ID" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
       
       <button onclick="submitDeposit()" class="w-full py-3 bg-green-600 rounded-lg font-bold">I Have Deposited</button>
       <p id="depositMsg" class="text-center mt-3 text-yellow-400"></p>
@@ -97,29 +96,31 @@
   </div>
 
 <script>
-  const SUPABASE_URL = 'https://bvgmcrqenrqtaedbaqav.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_4V777hQQNT5kYx6nCmR7Sw_vqH9B3QO';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   let currentUser = null;
 
-  // Load users from localStorage if not in supabase
   function getUsers() { return JSON.parse(localStorage.getItem('users')) || []; }
   function saveUsers(users) { localStorage.setItem('users', JSON.stringify(users)); }
   function getRequests() { return JSON.parse(localStorage.getItem('requests')) || []; }
   function saveRequests(reqs) { localStorage.setItem('requests', JSON.stringify(reqs)); }
 
-  function showLogin() { toggleForms('login'); }
-  function showRegister() { toggleForms('register'); }
-  function toggleForms(active) {
-    loginForm.classList.toggle('hidden', active!== 'login');
-    registerForm.classList.toggle('hidden', active!== 'register');
-    loginTab.classList.toggle('tab-active', active === 'login');
-    registerTab.classList.toggle('tab-active', active === 'register');
+  function showLogin() { 
+    loginForm.classList.remove('hidden');
+    registerForm.classList.add('hidden');
+    loginTab.classList.add('tab-active');
+    registerTab.classList.remove('tab-active');
+  }
+  function showRegister() { 
+    registerForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+    registerTab.classList.add('tab-active');
+    loginTab.classList.remove('tab-active');
   }
 
-  async function registerUser(e) {
-    e.preventDefault();
+  function registerUser() {
     let users = getUsers();
+    if(!regName.value ||!regEmail.value ||!regPass.value) {
+      authMessage.innerText = 'Please fill all fields'; authMessage.className = 'text-red-400'; return;
+    }
     users.push({name: regName.value, email: regEmail.value, number: regNumber.value, password: regPass.value, balance: 0});
     saveUsers(users);
     authMessage.innerText = 'Account Created! ✅ Now Login';
@@ -127,8 +128,7 @@
     registerForm.reset();
   }
 
-  async function loginUser(e) {
-    e.preventDefault();
+  function loginUser() {
     let users = getUsers();
     let user = users.find(u => u.email === loginEmail.value && u.password === loginPass.value);
     if(user) { currentUser = user; showDashboard(); } 
@@ -181,13 +181,11 @@
     let reqs = getRequests();
     let req = reqs[index];
     
-    // Add balance to user
     let users = getUsers();
     let user = users.find(u => u.email === req.email);
     if(user) user.balance += req.amount;
     saveUsers(users);
 
-    // Remove request
     reqs.splice(index, 1);
     saveRequests(reqs);
     
