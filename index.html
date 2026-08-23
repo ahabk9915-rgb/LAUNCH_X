@@ -7,11 +7,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
-  .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-  .tab-active { background: #06b6d4!important; }
-  .pic-card { background: #1e293b; padding: 10px; border-radius: 10px; text-align: center; }
-  .star { font-size: 20px; cursor: pointer; color: #475569; }
-  .star.active { color: #facc15; }
+ .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+ .tab-active { background: #06b6d4!important; }
+ .pic-card { background: #1e293b; padding: 10px; border-radius: 10px; text-align: center; }
+ .star { font-size: 20px; cursor: pointer; color: #475569; }
+ .star.active { color: #facc15; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -42,6 +42,22 @@
         <button type="button" onclick="registerUser()" class="w-full py-3 bg-cyan-600 rounded-lg font-bold">Submit</button>
       </div>
       <p id="authMessage" class="text-center mt-4 text-sm"></p>
+    </div>
+  </div>
+
+  <!-- DEPOSIT PAGE - NEW -->
+  <div id="depositPage" class="hidden flex items-center justify-center p-4">
+    <div class="glass rounded-2xl p-8 w-full max-w-md text-center">
+      <h2 class="text-2xl font-bold mb-4 text-yellow-400">Account Activation Fee</h2>
+      <p class="text-lg mb-2">Send <span class="text-green-400 font-bold">300 PKR</span> to:</p>
+      <div class="bg-orange-500 p-4 rounded-lg mb-4">
+        <p class="text-2xl font-bold">03368881011</p>
+        <p>Abdul Rehan - JazzCash</p>
+      </div>
+      <label class="text-sm">Enter Transaction ID</label>
+      <input id="depositTx" type="text" placeholder="TX ID Here" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
+      <button type="button" onclick="submitDeposit()" class="w-full py-3 bg-green-600 rounded-lg font-bold">I Have Deposited</button>
+      <p id="depositMsg" class="text-center mt-4 text-yellow-400"></p>
     </div>
   </div>
 
@@ -76,7 +92,7 @@
     </div>
   </div>
 
-  <!-- TASK PAGE - 10 PICS WITH 5 STARS -->
+  <!-- TASK PAGE -->
   <div id="taskPage" class="hidden p-4 max-w-2xl mx-auto">
     <div class="glass rounded-2xl p-6">
       <h2 class="text-xl font-bold mb-2">Daily Task - Rate 10 Pics</h2>
@@ -126,10 +142,8 @@
       <button onclick="saveYT()" class="px-4 py-2 bg-green-600 rounded-lg">Save Link</button>
     </div>
     <div class="glass rounded-2xl p-6">
-      <h2 class="text-xl mb-3">Activate User Account</h2>
-      <input id="activateEmail" type="email" placeholder="User Email" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-      <button onclick="activateUser()" class="px-4 py-2 bg-green-600 rounded-lg">Activate</button>
-      <p id="adminMsg" class="text-sm mt-2"></p>
+      <h2 class="text-xl mb-3">Pending Deposit Requests</h2>
+      <div id="pendingList">No Pending Requests</div>
     </div>
   </div>
 
@@ -141,6 +155,8 @@
 
   function getUsers() { return JSON.parse(localStorage.getItem('users')) || []; }
   function saveUsers(users) { localStorage.setItem('users', JSON.stringify(users)); }
+  function getRequests() { return JSON.parse(localStorage.getItem('requests')) || []; }
+  function saveRequests(reqs) { localStorage.setItem('requests', JSON.stringify(reqs)); }
   function getData(key) { return JSON.parse(localStorage.getItem(key)) || {}; }
   function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
   function getSetting(key) { return localStorage.getItem(key) || 'https://youtube.com/@abakKhan-w8k'; }
@@ -155,7 +171,10 @@
     if(users.find(u => u.email === regEmail.value)) { authMessage.innerText = 'Email already exists'; authMessage.className = 'text-red-400'; return; }
     users.push({name: regName.value, email: regEmail.value, number: regNumber.value, password: regPass.value, balance: 0.00, active: false});
     saveUsers(users);
-    authMessage.innerText = 'Account Created! ✅ Wait for Admin Activation'; authMessage.className = 'text-green-400';
+    // NEW: Go to Deposit Page after register
+    authPage.classList.add('hidden');
+    depositPage.classList.remove('hidden');
+    localStorage.setItem('tempEmail', regEmail.value);
     registerForm.reset();
   }
 
@@ -165,6 +184,17 @@
     if(!user) { authMessage.innerText = 'Invalid Email or Password'; authMessage.className = 'text-red-400'; return; }
     if(!user.active) { authMessage.innerText = 'Account Not Activated by Admin'; authMessage.className = 'text-red-400'; return; }
     currentUser = user; showDashboard();
+  }
+
+  // DEPOSIT
+  function submitDeposit() {
+    if(!depositTx.value) return alert('Enter Transaction ID');
+    let email = localStorage.getItem('tempEmail');
+    let reqs = getRequests();
+    reqs.push({email: email, amount: 300, tx: depositTx.value, status: 'pending'});
+    saveRequests(reqs);
+    depositMsg.innerText = '✅ Request Sent - Waiting for Admin Approval';
+    depositTx.value = '';
   }
 
   // ADMIN AUTH
@@ -178,7 +208,7 @@
   function adminLogout() { isAdmin = false; adminPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
 
   function showDashboard() {
-    authPage.classList.add('hidden'); adminLoginPage.classList.add('hidden'); taskPage.classList.add('hidden'); videoPage.classList.add('hidden'); withdrawPage.classList.add('hidden'); adminPage.classList.add('hidden');
+    authPage.classList.add('hidden'); adminLoginPage.classList.add('hidden'); depositPage.classList.add('hidden'); taskPage.classList.add('hidden'); videoPage.classList.add('hidden'); withdrawPage.classList.add('hidden'); adminPage.classList.add('hidden');
     dashboardPage.classList.remove('hidden');
     userName.innerText = currentUser.name; userBalance.innerText = currentUser.balance.toFixed(2);
   }
@@ -200,12 +230,12 @@
     }
   }
   function rateStar(pic, star) {
-    let stars = document.querySelectorAll(`#stars-${pic} .star`);
+    let stars = document.querySelectorAll(`#stars-${pic}.star`);
     stars.forEach((s, i) => s.classList.toggle('active', i < star));
   }
   function claimTask() {
     let rated = 0;
-    for(let i=1; i<=10; i++) { if(document.querySelectorAll(`#stars-${i} .star.active`).length === 5) rated++; }
+    for(let i=1; i<=10; i++) { if(document.querySelectorAll(`#stars-${i}.star.active`).length === 5) rated++; }
     if(rated < 10) return alert('Please give 5 stars to all 10 pictures');
     let users = getUsers();
     let user = users.find(u => u.email === currentUser.email);
@@ -238,20 +268,41 @@
   function showWithdraw() { dashboardPage.classList.add('hidden'); withdrawPage.classList.remove('hidden'); }
   function requestWithdraw() {
     if(withdrawAmount.value < 0.5) return alert('Minimum $0.5');
-    if(!withdrawMethod.value || !withdrawNum.value) return alert('Enter Method and Number');
+    if(!withdrawMethod.value ||!withdrawNum.value) return alert('Enter Method and Number');
     alert(`Withdraw Request Sent\nMethod: ${withdrawMethod.value}\nNumber: ${withdrawNum.value}\nAmount: $${withdrawAmount.value}`);
     withdrawAmount.value = ''; withdrawNum.value = ''; withdrawMethod.value = '';
   }
 
   // ADMIN PANEL
-  function showAdminPanel() { adminLoginPage.classList.add('hidden'); adminPage.classList.remove('hidden'); ytLink.value = getSetting('ytLink'); }
+  function showAdminPanel() { adminLoginPage.classList.add('hidden'); adminPage.classList.remove('hidden'); ytLink.value = getSetting('ytLink'); loadRequests(); }
   function saveYT() { localStorage.setItem('ytLink', ytLink.value); adminMsg.innerText = '✅ YouTube Link Saved!'; adminMsg.className = 'text-green-400'; }
-  function activateUser() {
+  
+  function loadRequests() {
+    let reqs = getRequests().filter(r => r.status === 'pending');
+    let html = '';
+    if(reqs.length === 0) html = 'No Pending Requests';
+    reqs.forEach((r, i) => {
+      html += `<div class="glass p-3 mb-3 rounded-lg">
+        <p><b>Email:</b> ${r.email}</p>
+        <p><b>Amount:</b> ${r.amount} PKR</p>
+        <p><b>TX ID:</b> ${r.tx}</p>
+        <button onclick="approveDeposit(${i})" class="mt-2 px-4 py-2 bg-green-600 rounded-lg">Approve & Activate</button>
+      </div>`;
+    });
+    pendingList.innerHTML = html;
+  }
+
+  function approveDeposit(index) {
+    let reqs = getRequests();
+    let req = reqs[index];
     let users = getUsers();
-    let user = users.find(u => u.email === activateEmail.value);
-    if(user) { user.active = true; saveUsers(users); adminMsg.innerText = '✅ User Activated'; adminMsg.className = 'text-green-400'; }
-    else { adminMsg.innerText = '❌ User Not Found'; adminMsg.className = 'text-red-400'; }
-    activateEmail.value = '';
+    let user = users.find(u => u.email === req.email);
+    if(user) user.active = true;
+    saveUsers(users);
+    reqs.splice(index, 1);
+    saveRequests(reqs);
+    alert('✅ User Activated!');
+    loadRequests();
   }
 </script>
 </body>
