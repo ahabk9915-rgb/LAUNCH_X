@@ -45,7 +45,7 @@
     </div>
   </div>
 
-  <!-- DEPOSIT PAGE - FINAL UPDATED -->
+  <!-- DEPOSIT PAGE -->
   <div id="depositPage" class="hidden flex items-center justify-center p-4">
     <div class="glass rounded-2xl p-8 w-full max-w-md text-center">
       <h2 class="text-2xl font-bold mb-4 text-yellow-400">Account Activation Fee</h2>
@@ -58,7 +58,7 @@
       <input id="depositTx" type="text" placeholder="TX ID Here" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
       <button type="button" onclick="submitDeposit()" class="w-full py-3 bg-green-600 rounded-lg font-bold">I Have Deposited</button>
       
-      <!-- SUCCESS MESSAGE -->
+      <!-- SUCCESS MESSAGE AFTER CLICK -->
       <div id="depositSuccess" class="hidden mt-4">
         <p class="text-green-400 flex items-center justify-center gap-2"><span>✅</span> Request Sent - Waiting for Admin Approval</p>
         <div class="bg-slate-800 p-4 rounded-lg mt-3">
@@ -176,7 +176,6 @@
   function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
   function getSetting(key) { return localStorage.getItem(key) || 'https://youtube.com/@abakKhan-w8k'; }
 
-  // USER AUTH
   function showLogin() { loginForm.classList.remove('hidden'); registerForm.classList.add('hidden'); loginTab.classList.add('tab-active'); registerTab.classList.remove('tab-active'); }
   function showRegister() { registerForm.classList.remove('hidden'); loginForm.classList.add('hidden'); registerTab.classList.add('tab-active'); loginTab.classList.remove('tab-active'); }
 
@@ -200,7 +199,6 @@
     currentUser = user; showDashboard();
   }
 
-  // DEPOSIT
   function submitDeposit() {
     if(!depositTx.value) return alert('Enter Transaction ID');
     let email = localStorage.getItem('tempEmail');
@@ -211,7 +209,6 @@
     depositTx.value = '';
   }
 
-  // ADMIN AUTH
   function showAdminLogin() { authPage.classList.add('hidden'); dashboardPage.classList.add('hidden'); adminLoginPage.classList.remove('hidden'); }
   function backToUserAuth() { adminLoginPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
   function adminLogin() {
@@ -228,7 +225,6 @@
   }
   function logout() { currentUser = null; dashboardPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
 
-  // DAILY TASK
   function showTask() {
     dashboardPage.classList.add('hidden'); taskPage.classList.remove('hidden'); ratedPics = 0;
     let today = new Date().toDateString();
@@ -279,7 +275,6 @@
     showDashboard();
   }
 
-  // VIDEO
   function showVideo() { dashboardPage.classList.add('hidden'); videoPage.classList.remove('hidden'); videoMsg.innerText = ''; }
   function openYT() { window.open(getSetting('ytLink'), '_blank'); }
   function claimVideo() {
@@ -296,7 +291,6 @@
     userBalance.innerText = user.balance.toFixed(2);
   }
 
-  // WITHDRAW
   function showWithdraw() { dashboardPage.classList.add('hidden'); withdrawPage.classList.remove('hidden'); }
   function requestWithdraw() {
     if(withdrawAmount.value < 0.5) return alert('Minimum $0.5');
@@ -305,7 +299,6 @@
     withdrawAmount.value = ''; withdrawNum.value = ''; withdrawMethod.value = '';
   }
 
-  // ADMIN PANEL
   function showAdminPanel() { adminLoginPage.classList.add('hidden'); adminPage.classList.remove('hidden'); ytLink.value = getSetting('ytLink'); loadRequests(); }
   function saveYT() { localStorage.setItem('ytLink', ytLink.value); adminMsg.innerText = '✅ YouTube Link Saved!'; adminMsg.className = 'text-green-400'; }
   
