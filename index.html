@@ -1,203 +1,145 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Launch X - Supabase</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investment Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root{--bg:#0b0f14;--card:#111827;--muted:#94a3b8;--text:#e5e7eb;--brand:#3b82f6;--brand2:#22c55e;--warn:#f59e0b;--red:#ef4444;--purple:#7c3aed;--wa:#25D366}
-    *{box-sizing:border-box}body{margin:0;font-family:system-ui;background:linear-gradient(180deg,#0b0f14,#0a0a0a);color:var(--text)}
-    .container{max-width:900px;margin:0 auto;padding:24px}
-    .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:20px;margin-bottom:16px}
-    h1{font-size:28px;margin:0 0 8px} p{color:var(--muted);margin:0 0 16px}
-    .btn{padding:18px;border-radius:16px;border:1px solid #243244;background:#0f172a;color:#fff;font-weight:700;cursor:pointer;width:100%;margin-bottom:12px;font-size:16px}
-    .btn:hover{background:#1e293b}
-    .btn.brand{background:var(--brand)}.btn.green{background:var(--brand2)}.btn.red{background:var(--red)}.btn.yellow{background:var(--warn);color:#111}.btn.purple{background:var(--purple)}.btn.wa{background:var(--wa)}
-    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
-    .field input{padding:12px;border-radius:10px;border:1px solid #243244;background:#0b1220;color:#fff;width:100%}
-    .hidden{display:none}.header{display:flex;justify-content:space-between;align-items:center}
-    .btn-logout{padding:10px 16px;font-size:14px;width:auto;background:#ef4444}
-    .balance-box{background:linear-gradient(135deg,#3b82f6,#22c55e);padding:20px;border-radius:12px;text-align:center}
-    .balance-amount{font-size:36px;font-weight:900;color:#fff}.user-card{background:#0b1220;padding:12px;border-radius:10px;margin:10px 0}
-    .warn-note{color:#f59e0b;background:#1e293b;padding:10px;border-radius:8px}
-    .wa-box{background:#25D366;padding:12px;border-radius:10px;text-align:center;margin-top:16px}
+    body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
   </style>
 </head>
-<body>
-  <div class="container">
-    <section id="home" class="card">
-      <h1>Welcome to <span style="color:#3b82f6">Launch X</span></h1>
-      <p>Entry Fee: 300 PKR</p>
-      <button class="btn green" id="toRegister">Create Account</button>
-      <button class="btn brand" id="toLogin">Login</button>
-      <button class="btn purple" id="toAdmin">🔐 Admin Panel</button>
-      <div class="wa-box">
-        <b>Need Help?</b><br>
-        <a href="https://wa.me/923316035482" target="_blank" style="color:#fff;text-decoration:none">WhatsApp Support: 0331 6035482</a>
+<body class="min-h-screen">
+
+  <!-- LOGIN / REGISTER PAGE -->
+  <div id="authPage" class="flex items-center justify-center min-h-screen p-4">
+    <div class="glass rounded-2xl p-8 w-full max-w-md">
+      <h1 class="text-3xl font-bold text-center mb-6 text-cyan-400">Launch X</h1>
+      
+      <div id="authTabs" class="flex gap-2 mb-6">
+        <button onclick="showLogin()" id="loginTab" class="flex-1 py-2 rounded-lg bg-cyan-600">Login</button>
+        <button onclick="showRegister()" id="registerTab" class="flex-1 py-2 rounded-lg bg-slate-700">Register</button>
       </div>
-    </section>
 
-    <section id="register" class="card hidden">
-      <h1>Create Account</h1>
-      <form id="regForm">
-        <div class="field"><label>Full Name</label><input name="name" required/></div>
-        <div class="field"><label>Email</label><input name="email" type="email" required/></div>
-        <div class="field"><label>Phone</label><input name="number" required/></div>
-        <div class="field"><label>Referral Email</label><input name="referral"/></div>
-        <div class="field"><label>Password</label><input name="password" type="password" required/></div>
-        <button class="btn green" type="submit">Sign Up</button>
+      <!-- REGISTER FORM -->
+      <form id="registerForm" onsubmit="registerUser(event)">
+        <input id="regName" type="text" placeholder="Full Name" required class="w-full p-3 mb-3 rounded-lg bg-slate-800 border-slate-700">
+        <input id="regEmail" type="email" placeholder="Email" required class="w-full p-3 mb-3 rounded-lg bg-slate-800 border-slate-700">
+        <input id="regNumber" type="text" placeholder="Phone Number" class="w-full p-3 mb-3 rounded-lg bg-slate-800 border-slate-700">
+        <input id="regPass" type="password" placeholder="Password" required class="w-full p-3 mb-4 rounded-lg bg-slate-800 border-slate-700">
+        <button type="submit" class="w-full py-3 bg-cyan-600 rounded-lg font-bold hover:bg-cyan-700">Create Account</button>
       </form>
-      <button class="btn" id="backHome1">← Back</button>
-    </section>
 
-    <section id="login" class="card hidden">
-      <h1>Login</h1>
-      <form id="loginForm">
-        <div class="field"><label>Email</label><input name="email" type="email" required/></div>
-        <div class="field"><label>Password</label><input name="password" type="password" required/></div>
-        <button class="btn brand" type="submit">Login</button>
+      <!-- LOGIN FORM -->
+      <form id="loginForm" onsubmit="loginUser(event)" class="hidden">
+        <input id="loginEmail" type="email" placeholder="Email" required class="w-full p-3 mb-3 rounded-lg bg-slate-800 border border-slate-700">
+        <input id="loginPass" type="password" placeholder="Password" required class="w-full p-3 mb-4 rounded-lg bg-slate-800 border border-slate-700">
+        <button type="submit" class="w-full py-3 bg-cyan-600 rounded-lg font-bold hover:bg-cyan-700">Login</button>
       </form>
-      <button class="btn" id="backHome2">← Back</button>
-    </section>
+      
+      <p id="authMessage" class="text-center mt-4 text-sm"></p>
+    </div>
+  </div>
 
-    <section id="deposit" class="card hidden">
-      <h1>Entry Fee: 300 PKR</h1>
-      <div class="balance-box"><div class="balance-amount">300 PKR</div></div>
-      <p class="warn-note">Easypaisa: 03368881011 - Abdul Rehan</p>
-      <form id="depositForm">
-        <div class="field"><label>Transaction ID</label><input name="txid" required/></div>
-        <button class="btn green" type="submit">I Have Deposited</button>
+  <!-- DASHBOARD PAGE -->
+  <div id="dashboardPage" class="hidden p-4 max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">Welcome, <span id="userName"></span></h1>
+      <button onclick="logout()" class="px-4 py-2 bg-red-600 rounded-lg">Logout</button>
+    </div>
+    
+    <div class="glass rounded-2xl p-6 mb-6">
+      <p class="text-slate-400">Your Balance</p>
+      <p class="text-4xl font-bold text-green-400">$<span id="userBalance">0</span></p>
+    </div>
+
+    <div class="glass rounded-2xl p-6">
+      <h2 class="text-xl font-bold mb-4">Submit Deposit Request</h2>
+      <form onsubmit="submitDeposit(event)">
+        <input id="depositAmount" type="number" placeholder="Amount $" required class="w-full p-3 mb-3 rounded-lg bg-slate-800 border-slate-700">
+        <input id="depositTx" type="text" placeholder="Transaction ID" class="w-full p-3 mb-3 rounded-lg bg-slate-800 border-slate-700">
+        <button type="submit" class="w-full py-3 bg-green-600 rounded-lg font-bold">Submit Request</button>
       </form>
-    </section>
-
-    <section id="pending" class="card hidden"><h1>Approval Pending</h1><p class="warn-note">Admin approval ka wait karein</p></section>
-
-    <section id="dashboard" class="card hidden">
-      <div class="header"><h1>Dashboard</h1><button class="btn-logout" id="logoutBtn">LOGOUT</button></div>
-      <p>Welcome: <b><span id="userName"></span></b></p>
-      <div class="balance-box"><div>Your Balance $</div><div class="balance-amount" id="balance">$0.00</div></div>
-      <div class="grid-2">
-        <button class="btn brand" id="watchVideo">WATCH VIDEO</button>
-        <button class="btn green" id="inviteFriend">INVITE FRIEND</button>
-        <button class="btn yellow" id="addEarn">ADD EARN</button>
-        <button class="btn red" id="withdrawBtn">WITHDRAW</button>
-      </div>
-    </section>
-
-    <section id="admin" class="card hidden">
-      <h1>🔐 Admin Panel</h1>
-      <h3>📥 Pending Deposits</h3>
-      <div id="pendingList"></div>
-      <h3>👥 All Users</h3>
-      <div id="usersList"></div>
-      <button class="btn" id="backHomeAdmin">← Back</button>
-    </section>
+    </div>
   </div>
 
 <script>
-  // 👇👇 YAHAN APNA SUPABASE URL OR KEY DALO
-  const SUPABASE_URL = 'https://your-project.supabase.co'
-  const SUPABASE_ANON_KEY = 'your-anon-key'
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  
-  const $ = id => document.getElementById(id);
+  // ====== YE APKI KEYS HAIN ======
+  const SUPABASE_URL = 'https://bvgmcrqenrqtaedbaqav.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_4V777hQQNT5kYx6nCmR7Sw_vqH9B3QO';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   let currentUser = null;
 
-  function show(id){ ['home','register','login','deposit','pending','dashboard','admin'].forEach(s => $(s).classList.add('hidden')); $(id).classList.remove('hidden'); }
-
-  // BUTTONS FIXED
-  $('toRegister').onclick = () => show('register');
-  $('toLogin').onclick = () => show('login'); 
-  $('backHome1').onclick = () => show('home');
-  $('backHome2').onclick = () => show('home');
-  $('backHomeAdmin').onclick = () => show('home');
-  $('logoutBtn').onclick = () => { currentUser = null; show('home'); }
-
-  // REGISTER
-  $('regForm').onsubmit = async e => {
+  // --- AUTH FUNCTIONS ---
+  async function registerUser(e) {
     e.preventDefault();
-    const { error } = await supabase.from('users').insert([{
-      name: $('regForm').name.value,
-      email: $('regForm').email.value,
-      number: $('regForm').number.value,
-      password: $('regForm').password.value,
-      referred_by: $('regForm').referral.value
-    }]);
-    if(error){ alert(error.message); return; }
-    alert("Account ban gaya! Ab 300 deposit karein");
-    show('deposit');
+    const name = document.getElementById('regName').value;
+    const email = document.getElementById('regEmail').value;
+    const number = document.getElementById('regNumber').value;
+    const password = document.getElementById('regPass').value;
+
+    const { data, error } = await supabase.from('users').insert([{ name, email, number, password }]);
+    
+    if(error) {
+      document.getElementById('authMessage').innerText = 'Error: ' + error.message;
+    } else {
+      document.getElementById('authMessage').innerText = 'Account Created Successfully! ✅';
+    }
   }
 
-  // LOGIN
-  $('loginForm').onsubmit = async e => {
+  async function loginUser(e) {
     e.preventDefault();
-    const email = $('loginForm').email.value;
-    const password = $('loginForm').password.value;
-    const { data } = await supabase.from('users').select('*').eq('email', email).eq('password', password).single();
-    if(data){ 
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPass').value;
+
+    const { data, error } = await supabase.from('users').select('*').eq('email', email).eq('password', password).single();
+    
+    if(error || !data) {
+      document.getElementById('authMessage').innerText = 'Invalid Email or Password';
+    } else {
       currentUser = data;
-      if(!data.is_active){ show('pending'); } 
-      else {
-        $('userName').textContent = data.name;
-        $('balance').textContent = '$' + data.balance;
-        show('dashboard'); 
-      }
-    } else { alert("Wrong Email or Password!"); }
+      showDashboard();
+    }
   }
 
-  // DEPOSIT
-  $('depositForm').onsubmit = async e => {
+  function showDashboard() {
+    document.getElementById('authPage').classList.add('hidden');
+    document.getElementById('dashboardPage').classList.remove('hidden');
+    document.getElementById('userName').innerText = currentUser.name;
+    document.getElementById('userBalance').innerText = currentUser.balance;
+  }
+
+  function logout() {
+    currentUser = null;
+    document.getElementById('dashboardPage').classList.add('hidden');
+    document.getElementById('authPage').classList.remove('hidden');
+  }
+
+  function showLogin() {
+    document.getElementById('loginForm').classList.remove('hidden');
+    document.getElementById('registerForm').classList.add('hidden');
+    document.getElementById('loginTab').classList.add('bg-cyan-600');
+    document.getElementById('registerTab').classList.remove('bg-cyan-600');
+  }
+
+  function showRegister() {
+    document.getElementById('registerForm').classList.remove('hidden');
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('registerTab').classList.add('bg-cyan-600');
+    document.getElementById('loginTab').classList.remove('bg-cyan-600');
+  }
+
+  async function submitDeposit(e) {
     e.preventDefault();
-    const email = currentUser.email;
-    await supabase.from('pending_deposits').insert([{ user_email: email, tx_id: $('depositForm').txid.value }]);
-    alert("Request sent! Admin approval ka wait karein");
-    show('pending');
+    const amount = document.getElementById('depositAmount').value;
+    const tx_id = document.getElementById('depositTx').value;
+    
+    await supabase.from('pending_deposits').insert([{ user_email: currentUser.email, amount, tx_id }]);
+    alert('Deposit Request Submitted!');
   }
-
-  // ADMIN
-  $('toAdmin').onclick = async () => {
-    const email = prompt('Admin Email:');
-    const pass = prompt('Admin Password:');
-    if(email === 'admin@launchx.com' && pass === 'admin123'){
-      loadAdmin();
-      show('admin');
-    } else { alert('Wrong Email or Password!'); }
-  }
-
-  async function loadAdmin(){
-    const { data: pending } = await supabase.from('pending_deposits').select('*').eq('status', 'pending');
-    let html = '';
-    pending.forEach(p => {
-      html += `<div class="user-card">
-        <b>Email:</b> ${p.user_email}<br>
-        <b>TX ID:</b> ${p.tx_id}<br>
-        <b>Amount:</b> ${p.amount}<br>
-        <button class="btn green" onclick="approveUser('${p.user_email}', ${p.id})">Approve 300</button>
-      </div>`;
-    });
-    $('pendingList').innerHTML = html || 'No pending requests';
-
-    const { data: users } = await supabase.from('users').select('*');
-    let usersHtml = '';
-    users.forEach(u => {
-      usersHtml += `<div class="user-card"><b>${u.name}</b><br>Email: ${u.email}<br>Balance: $${u.balance}<br>Status: ${u.is_active ? 'Active' : 'Pending'}</div>`;
-    });
-    $('usersList').innerHTML = usersHtml;
-  }
-
-  window.approveUser = async (email, depositId) => {
-    await supabase.from('users').update({ balance: 300, is_active: true }).eq('email', email);
-    await supabase.from('pending_deposits').update({ status: 'approved' }).eq('id', depositId);
-    alert(email + " Approved!");
-    loadAdmin();
-  }
-
-  $('watchVideo').onclick = () => alert('Video section');
-  $('inviteFriend').onclick = () => alert('Referral: $0.25 per referral');
-  $('addEarn').onclick = () => alert('Ad Earn');
-  $('withdrawBtn').onclick = () => alert('Withdraw');
 </script>
 </body>
 </html>
