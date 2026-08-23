@@ -1,431 +1,323 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ur">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Launch X</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
-.glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-.tab-active { background: #06b6d4!important; }
-.pic-card { background: #1e293b; padding: 12px; border-radius: 12px; text-align: center; }
-.star { font-size: 22px; cursor: pointer; color: #475569; transition: 0.2s; }
-.star.active { color: #facc15; }
-.checkbox { accent-color: #06b6d4; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Launch X</title>
+<style>
+  :root{--bg:#0b0f14;--card:#111827;--text:#e5e7eb;--brand:#3b82f6;--green:#22c55e;--purple:#7c3aed;--wa:#25D366;--yellow:#f59e0b;--red:#ef4444}
+  *{box-sizing:border-box} body{margin:0;font-family:system-ui;background:#0b0f14;color:var(--text)}
+ .container{max-width:600px;margin:20px auto;padding:16px}
+ .card{background:var(--card);border-radius:16px;padding:20px;border:1px solid #1f2937;margin-bottom:16px}
+  h1{text-align:center;margin:0 0 16px;font-size:24px}
+ .btn{width:100%;padding:16px;margin:8px 0;border-radius:12px;border:none;font-size:16px;font-weight:700;cursor:pointer}
+ .btn.green{background:var(--green);color:#fff}.btn.brand{background:var(--brand);color:#fff}
+ .btn.purple{background:var(--purple);color:#fff}.btn.wa{background:var(--wa);color:#fff}
+ .btn.yellow{background:var(--yellow);color:#111}.btn.red{background:var(--red);color:#fff}
+ .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+ .field{margin-bottom:12px}.field input{width:100%;padding:12px;border-radius:8px;border:1px solid #333;background:#0b1220;color:#fff}
+ .hidden{display:none}.timer{text-align:center;font-size:28px;color:var(--yellow);margin:20px 0;font-weight:900}
+ .balance-box{background:linear-gradient(135deg,#3b82f6,#22c55e);padding:20px;border-radius:12px;text-align:center;margin:16px 0}
+ .balance-amount{font-size:32px;font-weight:900;color:#fff}
+ .deposit-box{background:linear-gradient(135deg,#f59e0b,#ef4444);padding:16px;border-radius:12px;text-align:center;margin:16px 0}
+ .warn{background:#1e293b;padding:12px;border-radius:8px;color:var(--yellow);margin:10px 0}
+ .danger{background:#ef4444;padding:12px;border-radius:8px;color:#fff;font-weight:700;text-align:center;margin:10px 0}
+ .pic-task{background:#0b1220;padding:12px;border-radius:10px;margin-bottom:12px;border:1px solid #243244}
+ .pic-task img{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px}
+ .stars{display:flex;gap:6px;justify-content:center}
+ .star{font-size:28px;color:#444;cursor:pointer;transition:0.2s}
+ .star.active{color:#f59e0b;transform:scale(1.2)}
+ .rated-text{color:#22c55e;font-size:12px;text-align:center;margin-top:4px}
+ .header{display:flex;justify-content:space-between;align-items:center}
+ .btn-logout{padding:8px 14px;font-size:14px;width:auto;background:var(--red)}
+ .ref-box{background:#0b1220;padding:14px;border-radius:10px;margin-top:16px;border:1px dashed #3b82f6}
+</style>
 </head>
-<body class="min-h-screen">
+<body>
+<div class="container">
 
-  <!-- HEADER -->
-  <div class="p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold text-cyan-400">🚀 Launch X</h1>
-    <button onclick="showAdminLogin()" class="px-4 py-2 bg-purple-600 rounded-lg">Admin Panel</button>
+  <!-- HOME -->
+  <div id="home" class="card">
+    <h1>🚀 Launch X</h1>
+    <button class="btn green" onclick="show('register')">Create New Account</button>
+    <button class="btn brand" onclick="show('login')">Login To Existing Account</button>
+    <a href="https://wa.me/923316035482" target="_blank"><button class="btn wa">WhatsApp Support: 0331 6035482</button></a>
+    <button class="btn purple" onclick="show('admin')">Admin Panel</button>
   </div>
 
-  <!-- USER AUTH PAGE -->
-  <div id="authPage" class="flex items-center justify-center p-4">
-    <div class="glass rounded-2xl p-8 w-full max-w-md">
-      <div class="flex gap-2 mb-6">
-        <button type="button" onclick="showLogin()" id="loginTab" class="flex-1 py-2 rounded-lg bg-slate-700 tab-active">Login</button>
-        <button type="button" onclick="showRegister()" id="registerTab" class="flex-1 py-2 rounded-lg bg-slate-700">Create Account</button>
-      </div>
-      <div id="loginForm">
-        <input id="loginEmail" type="email" placeholder="Email" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-        <input id="loginPass" type="password" placeholder="Password" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
-        <button type="button" onclick="loginUser()" class="w-full py-3 bg-cyan-600 rounded-lg font-bold">Login</button>
-      </div>
-      <div id="registerForm" class="hidden">
-        <input id="regName" type="text" placeholder="Full Name" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-        <input id="regEmail" type="email" placeholder="Email" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-        <input id="regNumber" type="text" placeholder="Phone Number 03xxxxxxxxx" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-        <input id="regPass" type="password" placeholder="Password" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
-        <button type="button" onclick="registerUser()" class="w-full py-3 bg-cyan-600 rounded-lg font-bold">Submit</button>
-      </div>
-      <p id="authMessage" class="text-center mt-4 text-sm"></p>
-    </div>
+  <!-- REGISTER -->
+  <div id="register" class="card hidden">
+    <h1>Create Account</h1>
+    <form id="regForm">
+      <div class="field"><input name="name" placeholder="Full Name" required></div>
+      <div class="field"><input name="email" type="email" placeholder="Email" required></div>
+      <div class="field"><input name="number" placeholder="Phone Number" required></div>
+      <div class="field"><input name="referral" placeholder="Referral Email - Optional"></div>
+      <div class="field"><input name="password" type="password" placeholder="Password" required></div>
+      <button class="btn green" type="submit">Submit</button>
+    </form>
+    <button class="btn" onclick="show('home')">← Back</button>
   </div>
 
-  <!-- DEPOSIT PAGE -->
-  <div id="depositPage" class="hidden flex items-center justify-center p-4">
-    <div class="glass rounded-2xl p-8 w-full max-w-md text-center">
-      <h2 class="text-2xl font-bold mb-4 text-yellow-400">Account Activation Fee</h2>
-      <p class="text-lg mb-2">Send <span class="text-green-400 font-bold">300 PKR</span> to:</p>
-      <div class="bg-orange-500 p-4 rounded-lg mb-4">
-        <p class="text-2xl font-bold">03368881011</p>
-        <p>Abdul Rehan - JazzCash</p>
-      </div>
-      <label class="text-sm">Enter Transaction ID</label>
-      <input id="depositTx" type="text" placeholder="TX ID Here" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
-      <button type="button" onclick="submitDeposit()" class="w-full py-3 bg-green-600 rounded-lg font-bold">I Have Deposited</button>
-      <div id="depositSuccess" class="hidden mt-4">
-        <p class="text-green-400 flex items-center justify-center gap-2"><span>✅</span> Request Sent - Waiting for Admin Approval</p>
-        <div class="bg-slate-800 p-4 rounded-lg mt-3">
-          <p class="text-sm text-slate-400 mb-2">For Quick Activation Contact:</p>
-          <p class="text-2xl font-bold text-cyan-400">03316035482</p>
-          <p class="text-yellow-400 font-bold mt-2">📸 Send Screenshot to this Number</p>
-          <p class="text-sm text-white mt-2">جس اکاؤنٹ سے پیسے بھیجے ہیں اس کا نمبر اور نام بھی اسی نمبر پر بھیجیں</p>
-          <p class="text-yellow-400 mt-2">Contact Admin for Activation</p>
-        </div>
-      </div>
-    </div>
+  <!-- VERIFICATION - 10 SEC -->
+  <div id="verify" class="card hidden">
+    <h1>Fast Verification</h1>
+    <p>صرف 10 سیکنڈ انتظار کریں...</p>
+    <div class="timer" id="timer">10</div>
   </div>
 
-  <!-- ADMIN LOGIN PAGE -->
-  <div id="adminLoginPage" class="hidden flex items-center justify-center p-4">
-    <div class="glass rounded-2xl p-8 w-full max-w-md">
-      <h2 class="text-2xl font-bold text-center mb-6 text-purple-400">Admin Login</h2>
-      <input id="adminEmail" type="email" placeholder="Admin Email" value="admin@launchx.com" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-      <input id="adminPass" type="password" placeholder="Admin Password" value="admin123" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
-      <button type="button" onclick="adminLogin()" class="w-full py-3 bg-purple-600 rounded-lg font-bold">Login as Admin</button>
-      <button onclick="backToUserAuth()" class="w-full py-2 mt-3 bg-slate-700 rounded-lg">Back</button>
-      <p id="adminLoginMsg" class="text-center mt-4 text-sm"></p>
-    </div>
+  <!-- PAYMENT -->
+  <div id="payment" class="card hidden">
+    <h1>Entry Fee: 300 PKR</h1>
+    <div class="deposit-box"><div class="balance-amount">300 PKR</div></div>
+    <div class="warn">Easypaisa: <b>03368881011</b><br>Name: <b>Abdul Reham</b></div>
+    <form id="paymentForm">
+      <div class="field"><input name="txid" placeholder="Transaction ID" required></div>
+      <button class="btn green" type="submit">I Have Paid</button>
+    </form>
   </div>
 
-  <!-- DASHBOARD PAGE -->
-  <div id="dashboardPage" class="hidden p-4 max-w-4xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">Welcome, <span id="userName"></span></h1>
-      <button onclick="logout()" class="px-4 py-2 bg-red-600 rounded-lg">Logout</button>
+  <!-- PENDING -->
+  <div id="pending" class="card hidden">
+    <h1>Approval Pending</h1>
+    <div class="warn">Admin approval ka wait karein. Masla ho to WhatsApp: 0331 6035482</div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="login" class="card hidden">
+    <h1>Login</h1>
+    <form id="loginForm">
+      <div class="field"><input name="email" type="email" placeholder="Email" required></div>
+      <div class="field"><input name="password" type="password" placeholder="Password" required></div>
+      <button class="btn brand" type="submit">Login</button>
+    </form>
+    <button class="btn" onclick="show('home')">← Back</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="card hidden">
+    <div class="header"><h1>Dashboard</h1><button class="btn-logout" onclick="logout()">LOGOUT</button></div>
+    <p>Welcome: <b id="userName"></b></p>
+    <div class="balance-box"><div>Your Balance $</div><div class="balance-amount" id="balance">$0.00</div></div>
+    <div class="grid-2">
+      <button class="btn yellow" onclick="show('addearn')">ADD EARN</button>
+      <button class="btn brand" onclick="show('task')">COMPLETE TASK</button>
+      <button class="btn green" onclick="show('video')">WATCH VIDEO</button>
+      <button class="btn purple" onclick="copyRef()">INVITE FRIEND</button>
+      <button class="btn red" style="grid-column:1/3" onclick="show('withdraw')">WITHDRAW</button>
     </div>
-    <div class="glass rounded-2xl p-6 mb-4 text-center">
-      <p class="text-slate-400">Your Balance $</p>
-      <p class="text-4xl font-bold text-green-400">$<span id="userBalance">0.00</span></p>
-      <p class="text-xs text-slate-400 mt-2">Referred: <span id="referCount">0</span> Friends | Earned: $<span id="referEarned">0.00</span></p>
-    </div>
-    <div class="grid grid-cols-2 gap-4">
-      <button onclick="showRefer()" class="p-4 rounded-xl font-bold bg-yellow-600">REFER & EARN</button>
-      <button onclick="showTask()" class="p-4 rounded-xl font-bold bg-blue-600">DAILY TASK</button>
-      <button onclick="showVideo()" class="p-4 rounded-xl font-bold bg-green-600">WATCH VIDEO</button>
-      <button onclick="alert('Coming Soon')" class="p-4 rounded-xl font-bold bg-purple-600">ADD EARN</button>
-      <button onclick="showWithdraw()" class="p-4 rounded-xl font-bold bg-red-600 col-span-2">WITHDRAW</button>
+    <div class="ref-box hidden" id="refBox">
+      <h3>📢 Your Referral Link</h3>
+      <input id="refLink" readonly style="width:100%;padding:12px;background:#111;color:#fff;border:1px solid #3b82f6;border-radius:8px;margin:8px 0"/>
+      <button class="btn green" onclick="copyRef()">📋 Copy Link</button>
+      <p class="warn">Har referral par $0.25 milega</p>
     </div>
   </div>
 
-  <!-- REFER PAGE - NEW -->
-  <div id="referPage" class="hidden p-4 max-w-md mx-auto">
-    <div class="glass rounded-2xl p-6">
-      <h2 class="text-xl font-bold mb-2">Invite Friends & Earn $0.10</h2>
-      <p class="text-sm mb-4">جب آپ کا دوست 300 PKR deposit کرے گا تو آپ کو $0.10 ملیں گے</p>
-      <div class="bg-slate-800 p-3 rounded-lg mb-3">
-        <p class="text-xs mb-1">Your Referral Link:</p>
-        <p id="referLink" class="text-cyan-400 break-all"></p>
-      </div>
-      <button onclick="copyLink()" class="w-full py-3 bg-cyan-600 rounded-lg font-bold mb-3">📋 Copy Link</button>
-      <button onclick="showDashboard()" class="w-full py-2 bg-slate-700 rounded-lg">Back</button>
+  <!-- WATCH VIDEO -->
+  <div id="video" class="card hidden">
+    <h1>Watch Video & Earn $0.05</h1>
+    <div class="danger">⚠️ SUBSCRIBE IT OTHERWISE YOU WILL NOT ABLE TO WITHDRAW ⚠️</div>
+    <div class="warn">
+      <h3>📋 Conditions:</h3>
+      <p>1. Link پر کلک کر کے پوری Shorts دیکھیں</p>
+      <p>2. Channel @AhabKhan-w8k کو Subscribe کریں</p>
+      <p>3. واپس آ کر "I Watched" دبائیں</p>
     </div>
+    <a href="https://youtube.com/shorts/PNsbWwa3Kwo?si=D_UeRPeGJD9n_f7Y" target="_blank">
+      <button class="btn red">▶️ START VIDEO</button>
+    </a>
+    <button class="btn green" onclick="earnVideo()">✅ I WATCHED - Claim $0.05</button>
+    <button class="btn" onclick="show('dashboard')">← Back</button>
   </div>
 
-  <!-- DAILY TASK PAGE -->
-  <div id="taskPage" class="hidden p-4 max-w-4xl mx-auto">
-    <div class="glass rounded-2xl p-6">
-      <h2 class="text-2xl font-bold mb-1">Daily Tasks</h2>
-      <p class="text-sm text-slate-400 mb-4">Complete tasks to earn rewards | <span id="taskProgress">0 of 10 completed</span></p>
-      <div class="w-full bg-slate-700 rounded-full h-2.5 mb-6">
-        <div id="progressBar" class="bg-green-500 h-2.5 rounded-full" style="width: 0%"></div>
-      </div>
-      <div id="picGrid" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4"></div>
-      <button id="claimBtn" onclick="claimTask()" class="w-full py-3 bg-green-600 rounded-lg font-bold">Claim $0.01</button>
-      <button onclick="showDashboard()" class="w-full py-2 mt-3 bg-slate-700 rounded-lg">Back</button>
-      <p id="taskMsg" class="text-center mt-3 text-yellow-400"></p>
-    </div>
+  <!-- COMPLETE TASK -->
+  <div id="task" class="card hidden">
+    <h1>Daily Task - Rate 10 Pics</h1>
+    <p><b>1 Pic = $0.001 | Total 10 Pics = $0.01</b></p>
+    <p class="warn">Har picture ko 1-5 star rating dena lazmi hai</p>
+    <div id="taskContainer"></div>
+    <button class="btn green" onclick="claimTask()">Claim $0.01</button>
+    <button class="btn" onclick="show('dashboard')">← Back</button>
   </div>
 
-  <!-- VIDEO PAGE - UPDATED WITH 3 CONDITIONS -->
-  <div id="videoPage" class="hidden p-4 max-w-md mx-auto">
-    <div class="glass rounded-2xl p-6">
-      <h2 class="text-xl font-bold mb-2">Watch Video & Subscribe</h2>
-      <p class="text-red-400 text-xs mb-3">⚠️ SUBSCRIBE IT OTHERWISE YOU WILL NOT ABLE TO WITHDRAW ⚠️</p>
-
-      <div class="space-y-2 mb-4 text-sm">
-        <label class="flex items-center gap-2"><input type="checkbox" id="check1" class="checkbox"> 1. Video کو پورا دیکھیں</label>
-        <label class="flex items-center gap-2"><input type="checkbox" id="check2" class="checkbox"> 2. Channel کو Subscribe کریں</label>
-        <label class="flex items-center gap-2"><input type="checkbox" id="check3" class="checkbox"> 3. Bell Icon دبائیں</label>
-      </div>
-
-      <button id="ytBtn" onclick="openYT()" class="w-full py-3 bg-red-600 rounded-lg font-bold mb-3">▶️ Watch Video Now</button>
-      <button id="claimVideoBtn" onclick="claimVideo()" class="w-full py-3 bg-green-600 rounded-lg font-bold mb-3 opacity-50" disabled>I Subscribed - Claim $0.05</button>
-      <button onclick="showDashboard()" class="w-full py-2 bg-slate-700 rounded-lg">Back</button>
-      <p id="videoMsg" class="text-center mt-3 text-yellow-400"></p>
-    </div>
+  <!-- WITHDRAW -->
+  <div id="withdraw" class="card hidden">
+    <h1>Withdraw</h1>
+    <div class="danger">⚠️ YouTube Subscribe karna lazmi hai warna withdraw reject ho jaye ga</div>
+    <p>Minimum Withdraw: $0.5</p>
+    <form id="withdrawForm">
+      <div class="field"><input name="easypaisa" placeholder="Your Easypaisa Number" required></div>
+      <div class="field"><input name="amount" type="number" step="0.01" placeholder="Amount" required></div>
+      <button class="btn red" type="submit">Request Withdraw</button>
+    </form>
+    <button class="btn" onclick="show('dashboard')">← Back</button>
   </div>
 
-  <!-- WITHDRAW PAGE - UPDATED VALIDATION -->
-  <div id="withdrawPage" class="hidden p-4 max-w-md mx-auto">
-    <div class="glass rounded-2xl p-6">
-      <h2 class="text-xl font-bold mb-2">Withdraw</h2>
-      <p class="text-sm mb-4">Minimum Withdraw: $0.5 | Available: $<span id="availableBal">0.00</span></p>
-      <select id="withdrawMethod" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-        <option value="">Select Method</option>
-        <option value="JazzCash">JazzCash</option>
-        <option value="Easypaisa">Easypaisa</option>
-      </select>
-      <input id="withdrawNum" type="text" placeholder="Your Number 03xxxxxxxxx" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-      <input id="withdrawAmount" type="number" step="0.01" placeholder="Amount $" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-      <button onclick="requestWithdraw()" class="w-full py-3 bg-red-600 rounded-lg font-bold mb-3">Request Withdraw</button>
-      <button onclick="showDashboard()" class="w-full py-2 bg-slate-700 rounded-lg">Back</button>
-      <p id="withdrawMsg" class="text-center mt-3"></p>
-    </div>
+  <!-- ADMIN -->
+  <div id="admin" class="card hidden">
+    <h1>🔐 Admin Panel</h1>
+    <form id="adminForm">
+      <div class="field"><input name="email" type="email" placeholder="Admin Email" required></div>
+      <div class="field"><input name="password" type="password" placeholder="Admin Password" required></div>
+      <button class="btn purple" type="submit">Login</button>
+    </form>
+    <button class="btn" onclick="show('home')">← Back</button>
   </div>
 
-  <!-- ADMIN PANEL -->
-  <div id="adminPage" class="hidden p-4 max-w-4xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-purple-400">Admin Panel</h1>
-      <button onclick="adminLogout()" class="px-4 py-2 bg-red-600 rounded-lg">Admin Logout</button>
-    </div>
-    <div class="glass rounded-2xl p-6 mb-4">
-      <h2 class="text-xl mb-3">YouTube Link Settings</h2>
-      <input id="ytLink" type="text" value="https://youtube.com/shorts/PNsbWwa3Kwo?si=o_nJdsPS6TfjUEMh" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-      <button onclick="saveYT()" class="px-4 py-2 bg-green-600 rounded-lg">Save Link</button>
-    </div>
-    <div class="glass rounded-2xl p-6">
-      <h2 class="text-xl mb-3">Pending Deposit Requests</h2>
-      <div id="pendingList">No Pending Requests</div>
-    </div>
+  <!-- ADMIN DASH -->
+  <div id="adminDash" class="card hidden">
+    <h1>Admin Dashboard</h1>
+    <h3>📥 Pending Payments</h3><div id="pendingList"></div>
+    <h3>👥 All Users</h3><div id="usersList"></div>
+    <button class="btn" onclick="show('home')">Logout</button>
   </div>
+
+</div>
 
 <script>
-  let currentUser = null;
-  let isAdmin = false;
-  let ratedPics = 0;
-  const ADMIN_EMAIL = "admin@launchx.com";
-  const ADMIN_PASS = "admin123";
-  const YT_LINK = "https://youtube.com/shorts/PNsbWwa3Kwo?si=o_nJdsPS6TfjUEMh";
+  const $ = id => document.getElementById(id);
+  const getUsers = () => JSON.parse(localStorage.getItem('lx_users') || '[]');
+  const saveUsers = u => localStorage.setItem('lx_users', JSON.stringify(u));
+  const getPending = () => JSON.parse(localStorage.getItem('lx_pending') || '[]');
+  const savePending = p => localStorage.setItem('lx_pending', JSON.stringify(p));
+  const getSession = () => JSON.parse(localStorage.getItem('lx_session') || 'null');
+  const setSession = s => localStorage.setItem('lx_session', JSON.stringify(s));
+  const clearSession = () => localStorage.removeItem('lx_session');
 
-  function getUsers() { return JSON.parse(localStorage.getItem('users')) || []; }
-  function saveUsers(users) { localStorage.setItem('users', JSON.stringify(users)); }
-  function getRequests() { return JSON.parse(localStorage.getItem('requests')) || []; }
-  function saveRequests(reqs) { localStorage.setItem('requests', JSON.stringify(reqs)); }
-  function getData(key) { return JSON.parse(localStorage.getItem(key)) || {}; }
-  function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+  let currentUser = getSession();
+  let taskRatings = {};
 
-  function validatePhone(num) {
-    return /^03\d{9}$/.test(num); // 03 + 9 digits
+  function show(id){
+    ['home','register','verify','payment','pending','login','dashboard','video','task','withdraw','admin','adminDash'].forEach(s => $(s).classList.add('hidden'));
+    $(id).classList.remove('hidden');
+    if(id==='task') loadPics();
+    if(id==='adminDash') loadAdmin();
   }
 
-  // USER AUTH
-  function showLogin() { loginForm.classList.remove('hidden'); registerForm.classList.add('hidden'); loginTab.classList.add('tab-active'); registerTab.classList.remove('tab-active'); }
-  function showRegister() { registerForm.classList.remove('hidden'); loginForm.classList.add('hidden'); registerTab.classList.add('tab-active'); loginTab.classList.remove('tab-active'); }
-
-  function registerUser() {
-    let users = getUsers();
-    if(!regName.value ||!regEmail.value ||!regPass.value ||!regNumber.value) { authMessage.innerText = 'Please fill all fields'; authMessage.className = 'text-red-400'; return; }
-    if(!validatePhone(regNumber.value)) { authMessage.innerText = 'Enter valid number: 03xxxxxxxxx'; authMessage.className = 'text-red-400'; return; }
-    if(users.find(u => u.email === regEmail.value)) { authMessage.innerText = 'Email already exists'; authMessage.className = 'text-red-400'; return; }
-
-    let refBy = localStorage.getItem('refBy') || null;
-    users.push({name: regName.value, email: regEmail.value, number: regNumber.value, password: regPass.value, balance: 0.00, active: false, referredBy: refBy, referCount: 0, referEarned: 0});
+  // REGISTER + 10s TIMER
+  $('regForm').onsubmit = e => {
+    e.preventDefault();
+    const users = getUsers();
+    const email = $('regForm').email.value;
+    const referral = $('regForm').referral.value;
+    if(users.find(u => u.email === email)){ alert("Email already exists!"); return; }
+    const newUser = {name:$('regForm').name.value, email, number:$('regForm').number.value, password:$('regForm').password.value, referral:referral, balance:0, active:false, taskDate:'', subscribed:false, subscribedVideo:false};
+    users.push(newUser);
+    if(referral){ const refUser = users.find(u => u.email === referral); if(refUser){ refUser.balance += 0.25; } }
     saveUsers(users);
-    localStorage.removeItem('refBy');
-    authPage.classList.add('hidden');
-    depositPage.classList.remove('hidden');
-    localStorage.setItem('tempEmail', regEmail.value);
-    registerForm.reset();
+    show('verify');
+    let time = 10;
+    const timer = setInterval(()=>{ $('timer').textContent = time--; if(time<0){ clearInterval(timer); show('payment'); } },1000);
   }
 
-  function loginUser() {
-    let users = getUsers();
-    let user = users.find(u => u.email === loginEmail.value && u.password === loginPass.value);
-    if(!user) { authMessage.innerText = 'Invalid Email or Password'; authMessage.className = 'text-red-400'; return; }
-    if(!user.active) { authMessage.innerText = 'Account Not Activated by Admin'; authMessage.className = 'text-red-400'; return; }
-    currentUser = user; showDashboard();
+  // PAYMENT
+  $('paymentForm').onsubmit = e => {
+    e.preventDefault();
+    const pending = getPending();
+    pending.push({email: getUsers().at(-1).email, txid:$('paymentForm').txid.value});
+    savePending(pending); show('pending');
   }
 
-  // DEPOSIT
-  function submitDeposit() {
-    if(!depositTx.value) return alert('Enter Transaction ID');
-    let email = localStorage.getItem('tempEmail');
-    let reqs = getRequests();
-    reqs.push({email: email, amount: 300, tx: depositTx.value, status: 'pending'});
-    saveRequests(reqs);
-    document.getElementById('depositSuccess').classList.remove('hidden');
-    depositTx.value = '';
+  // LOGIN
+  $('loginForm').onsubmit = e => {
+    e.preventDefault();
+    const user = getUsers().find(u => u.email === $('loginForm').email.value && u.password === $('loginForm').password.value);
+    if(!user){ alert("Wrong Email/Password"); return; }
+    if(!user.active){ show('pending'); return; }
+    currentUser = user; setSession(user);
+    $('userName').textContent = user.name; $('balance').textContent = '$'+user.balance.toFixed(2);
+    show('dashboard');
   }
 
-  // ADMIN AUTH
-  function showAdminLogin() { authPage.classList.add('hidden'); dashboardPage.classList.add('hidden'); adminLoginPage.classList.remove('hidden'); }
-  function backToUserAuth() { adminLoginPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
-  function adminLogin() {
-    if(adminEmail.value === ADMIN_EMAIL && adminPass.value === ADMIN_PASS) {
-      isAdmin = true; showAdminPanel();
-    } else { adminLoginMsg.innerText = 'Invalid Admin Email or Password'; adminLoginMsg.className = 'text-red-400'; }
-  }
-  function adminLogout() { isAdmin = false; adminPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
+  function logout(){ clearSession(); currentUser=null; show('home'); }
 
-  function showDashboard() {
-    authPage.classList.add('hidden'); adminLoginPage.classList.add('hidden'); depositPage.classList.add('hidden'); taskPage.classList.add('hidden'); videoPage.classList.add('hidden'); withdrawPage.classList.add('hidden'); adminPage.classList.add('hidden'); referPage.classList.add('hidden');
-    dashboardPage.classList.remove('hidden');
-    userName.innerText = currentUser.name; userBalance.innerText = currentUser.balance.toFixed(2);
-    referCount.innerText = currentUser.referCount || 0;
-    referEarned.innerText = (currentUser.referEarned || 0).toFixed(2);
-  }
-  function logout() { currentUser = null; dashboardPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
-
-  // REFER SYSTEM
-  function showRefer() {
-    dashboardPage.classList.add('hidden'); referPage.classList.remove('hidden');
-    referLink.innerText = window.location.origin + '?ref=' + currentUser.email;
-  }
-  function copyLink() {
-    navigator.clipboard.writeText(referLink.innerText);
-    alert('✅ Link Copied!');
+  // WATCH VIDEO EARN
+  function earnVideo(){
+    if(currentUser.subscribedVideo){ alert("آپ پہلے ہی یہ ویڈیو دیکھ چکے ہیں!"); return; }
+    currentUser.subscribed = true;
+    currentUser.subscribedVideo = true;
+    currentUser.balance += 0.05;
+    updateUser();
+    alert('✅ $0.05 Added Successfully!');
+    show('dashboard');
   }
 
-  // DAILY TASK
-  function showTask() {
-    dashboardPage.classList.add('hidden'); taskPage.classList.remove('hidden'); ratedPics = 0;
-    let today = new Date().toDateString();
-    let claims = getData('taskClaims');
-    if(claims[currentUser.email] === today) { taskMsg.innerText = '⚠️ You already completed today'; claimBtn.disabled = true; claimBtn.classList.add('opacity-50'); }
-    else { taskMsg.innerText = ''; claimBtn.disabled = false; claimBtn.classList.remove('opacity-50'); }
-
-    updateProgress();
-    picGrid.innerHTML = '';
-    for(let i=1; i<=10; i++) {
-      let stars = '';
-      for(let s=1; s<=5; s++) stars += `<span class="star" data-pic="${i}" data-star="${s}">★</span>`;
-      picGrid.innerHTML += `<div class="pic-card"><p class="mb-2">Task #${i}</p><div id="stars-${i}" class="flex justify-center gap-1">${stars}</div><p class="text-xs mt-2 text-green-400" id="earned-${i}"></p></div>`;
-    }
-    document.querySelectorAll('.star').forEach(star => {
-      star.onclick = function() {
-        let pic = this.dataset.pic;
-        let s = this.dataset.star;
-        if(document.querySelectorAll(`#stars-${pic}.star.active`).length >= 5) return;
-        let stars = document.querySelectorAll(`#stars-${pic}.star`);
-        stars.forEach((st, i) => st.classList.toggle('active', i < s));
-        if(s == 5 &&!this.parentElement.dataset.done) {
-          this.parentElement.dataset.done = true;
-          ratedPics++;
-          let users = getUsers();
-          let user = users.find(u => u.email === currentUser.email);
-          user.balance += 0.001;
-          saveUsers(users);
-          document.getElementById(`earned-${pic}`).innerText = '+$0.001 earned';
-          userBalance.innerText = user.balance.toFixed(2);
-          updateProgress();
-        }
-      }
-    })
-  }
-
-  function updateProgress() {
-    taskProgress.innerText = `${ratedPics} of 10 completed`;
-    progressBar.style.width = `${ratedPics * 10}%`;
-  }
-
-  function claimTask() {
-    if(ratedPics < 10) return alert('Please complete all 10 tasks');
-    let claims = getData('taskClaims');
-    claims[currentUser.email] = new Date().toDateString();
-    saveData('taskClaims', claims);
-    alert('✅ Daily Task Completed! +$0.01 Total');
-    showDashboard();
-  }
-
-  // VIDEO WITH 3 CONDITIONS
-  function showVideo() {
-    dashboardPage.classList.add('hidden'); videoPage.classList.remove('hidden'); videoMsg.innerText = '';
-    check1.checked = false; check2.checked = false; check3.checked = false;
-    claimVideoBtn.disabled = true; claimVideoBtn.classList.add('opacity-50');
-    [check1, check2, check3].forEach(cb => cb.onchange = enableClaimBtn);
-  }
-  function enableClaimBtn() {
-    if(check1.checked && check2.checked && check3.checked) {
-      claimVideoBtn.disabled = false; claimVideoBtn.classList.remove('opacity-50');
-    } else {
-      claimVideoBtn.disabled = true; claimVideoBtn.classList.add('opacity-50');
+  // TASK LOAD
+  function loadPics(){
+    taskRatings = {};
+    $('taskContainer').innerHTML='';
+    for(let i=1;i<=10;i++){
+      $('taskContainer').innerHTML += `
+        <div class="pic-task">
+          <img src="https://picsum.photos/400/200?random=${i}&t=${Date.now()}" alt="Task Pic ${i}">
+          <div class="stars" id="stars${i}">
+            <span class="star" onclick="ratePic(${i},1)">★</span>
+            <span class="star" onclick="ratePic(${i},2)">★</span>
+            <span class="star" onclick="ratePic(${i},3)">★</span>
+            <span class="star" onclick="ratePic(${i},4)">★</span>
+            <span class="star" onclick="ratePic(${i},5)">★</span>
+          </div>
+          <div class="rated-text" id="rated${i}">Not Rated</div>
+        </div>
+      `;
     }
   }
-  function openYT() { window.open(YT_LINK, '_blank'); }
-  function claimVideo() {
-    let claims = getData('videoClaims');
-    let today = new Date().toDateString();
-    if(claims[currentUser.email] === today) return videoMsg.innerText = '⚠️ Already claimed today';
-    let users = getUsers();
-    let user = users.find(u => u.email === currentUser.email);
-    user.balance += 0.05;
-    saveUsers(users);
-    claims[currentUser.email] = today;
-    saveData('videoClaims', claims);
-    videoMsg.innerText = '✅ $0.05 Added!';
-    userBalance.innerText = user.balance.toFixed(2);
+
+  function ratePic(picNo, rating){
+    taskRatings[picNo] = rating;
+    const stars = $(`stars${picNo}`).children;
+    for(let i=0; i<5; i++){ stars[i].classList.toggle('active', i < rating); }
+    $(`rated${picNo}`).textContent = `Rated: ${rating} ⭐`;
   }
 
-  // WITHDRAW WITH VALIDATION
-  function showWithdraw() {
-    dashboardPage.classList.add('hidden'); withdrawPage.classList.remove('hidden');
-    availableBal.innerText = currentUser.balance.toFixed(2);
-    withdrawMsg.innerText = '';
-  }
-  function requestWithdraw() {
-    let amount = parseFloat(withdrawAmount.value);
-    if(!withdrawMethod.value) return withdrawMsg.innerText = '❌ Select Method';
-    if(!validatePhone(withdrawNum.value)) return withdrawMsg.innerText = '❌ Enter valid number: 03xxxxxxxxx';
-    if(isNaN(amount) || amount < 0.5) return withdrawMsg.innerText = '❌ Minimum $0.5';
-    if(amount > currentUser.balance) return withdrawMsg.innerText = `❌ Insufficient Balance. You have $${currentUser.balance.toFixed(2)}`;
-
-    let users = getUsers();
-    let user = users.find(u => u.email === currentUser.email);
-    user.balance -= amount;
-    saveUsers(users);
-    currentUser = user;
-
-    alert(`✅ Withdraw Request Sent\nMethod: ${withdrawMethod.value}\nNumber: ${withdrawNum.value}\nAmount: $${amount}`);
-    withdrawAmount.value = ''; withdrawNum.value = ''; withdrawMethod.value = '';
-    showDashboard();
+  function claimTask(){
+    const today = new Date().toDateString();
+    if(currentUser.taskDate === today){ alert("Aaj ka task complete ho chuka hai! Kal wapis aana"); return; }
+    if(Object.keys(taskRatings).length < 10){ alert("Pehle 10 pictures ko rating dein"); return; }
+    currentUser.balance += 0.01;
+    currentUser.taskDate = today;
+    updateUser();
+    alert('✅ $0.01 Added! Task Complete');
+    show('dashboard');
   }
 
-  // ADMIN PANEL
-  function showAdminPanel() { adminLoginPage.classList.add('hidden'); adminPage.classList.remove('hidden'); ytLink.value = YT_LINK; loadRequests(); }
-  function saveYT() { localStorage.setItem('ytLink', ytLink.value); alert('✅ YouTube Link Saved!'); }
-
-  function loadRequests() {
-    let reqs = getRequests().filter(r => r.status === 'pending');
-    let html = '';
-    if(reqs.length === 0) html = 'No Pending Requests';
-    reqs.forEach((r, i) => {
-      html += `<div class="glass p-3 mb-3 rounded-lg">
-        <p><b>Email:</b> ${r.email}</p>
-        <p><b>Amount:</b> ${r.amount} PKR</p>
-        <p><b>TX ID:</b> ${r.tx}</p>
-        <button onclick="approveDeposit(${i})" class="mt-2 px-4 py-2 bg-green-600 rounded-lg">Approve & Activate</button>
-      </div>`;
-    });
-    pendingList.innerHTML = html;
+  // WITHDRAW
+  $('withdrawForm').onsubmit = e => {
+    e.preventDefault();
+    if(!currentUser.subscribed){ alert("⚠️ Pehle YouTube Channel Subscribe karein!"); show('video'); return; }
+    const amount = parseFloat($('withdrawForm').amount.value);
+    if(amount<0.5){ alert("Minimum $0.5"); return; }
+    if(amount>currentUser.balance){ alert("Balance kam hai"); return; }
+    currentUser.balance -= amount; updateUser(); alert('Withdraw Request Sent!'); show('dashboard');
   }
 
-  function approveDeposit(index) {
-    let reqs = getRequests();
-    let req = reqs[index];
-    let users = getUsers();
-    let user = users.find(u => u.email === req.email);
-    if(user) {
-      user.active = true;
-      // REFERRAL BONUS
-      if(user.referredBy) {
-        let refUser = users.find(u => u.email === user.referredBy);
-        if(refUser) {
-          refUser.referCount += 1;
-          refUser.referEarned += 0.10;
-          refUser.balance += 0.10;
-        }
-      }
-      saveUsers(users);
-    }
-    reqs.splice(index, 1);
-    saveRequests(reqs);
-    alert('✅ User Activated! Referral Bonus Given');
-    loadRequests();
+  function updateUser(){ const users=getUsers(); const i=users.findIndex(u=>u.email===currentUser.email); users[i]=currentUser; saveUsers(users); setSession(currentUser); $('balance').textContent='$'+currentUser.balance.toFixed(2); }
+
+  function copyRef(){
+    $('refBox').classList.remove('hidden');
+    $('refLink').value = window.location.origin + "?ref=" + currentUser.email;
+    navigator.clipboard.writeText($('refLink').value);
+    alert('Referral Link Copied! ✅');
   }
 
-  // Check for referral link on page load
-  window.onload = function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const ref = urlParams.get('ref');
-    if(ref) localStorage.setItem('refBy', ref);
+  // ADMIN
+  $('adminForm').onsubmit = e => {
+    e.preventDefault();
+    if($('adminForm').email.value==='admin@launchx.com' && $('adminForm').password.value==='admin123'){ show('adminDash'); }
+    else alert('Wrong!');
   }
+  function loadAdmin(){
+    const pending=getPending(); let html='';
+    pending.forEach((p,i)=>{ html+=`<div class="warn"><b>${p.email}</b><br>TX: ${p.txid}<br><button class="btn green" onclick="approve(${i})">Approve</button></div>`; });
+    $('pendingList').innerHTML=html||'No Pending';
+    let usersHtml=''; getUsers().forEach(u=>{ usersHtml+=`<div class="warn"><b>${u.name}</b><br>${u.email}<br>Balance: $${u.balance}<br>Subscribed: ${u.subscribed?'Yes':'No'}<br>Status: ${u.active?'Active':'Pending'}</div>`; });
+    $('usersList').innerHTML=usersHtml;
+  }
+  function approve(i){ const pending=getPending(); const users=getUsers(); const u=users.find(x=>x.email===pending[i].email); u.active=true; u.balance=300; users[users.findIndex(x=>x.email===u.email)]=u; pending.splice(i,1); saveUsers(users); savePending(pending); alert('Approved!'); loadAdmin(); }
+
+  if(currentUser && currentUser.active){ $('userName').textContent=currentUser.name; $('balance').textContent='$'+currentUser.balance.toFixed(2); show('dashboard'); }
+  else if(currentUser){ show('pending'); }
 </script>
 </body>
 </html>
