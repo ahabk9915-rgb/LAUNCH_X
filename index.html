@@ -45,7 +45,7 @@
     </div>
   </div>
 
-  <!-- DEPOSIT PAGE - UPDATED -->
+  <!-- DEPOSIT PAGE - FINAL UPDATED -->
   <div id="depositPage" class="hidden flex items-center justify-center p-4">
     <div class="glass rounded-2xl p-8 w-full max-w-md text-center">
       <h2 class="text-2xl font-bold mb-4 text-yellow-400">Account Activation Fee</h2>
@@ -58,13 +58,15 @@
       <input id="depositTx" type="text" placeholder="TX ID Here" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
       <button type="button" onclick="submitDeposit()" class="w-full py-3 bg-green-600 rounded-lg font-bold">I Have Deposited</button>
       
-      <!-- YEH NAYA DIV HAI -->
+      <!-- SUCCESS MESSAGE -->
       <div id="depositSuccess" class="hidden mt-4">
         <p class="text-green-400 flex items-center justify-center gap-2"><span>✅</span> Request Sent - Waiting for Admin Approval</p>
-        <div class="bg-slate-800 p-3 rounded-lg mt-3">
-          <p class="text-sm text-slate-400">For Quick Activation Contact:</p>
-          <p class="text-xl font-bold text-cyan-400">03316035482</p>
-          <p class="text-yellow-400">Contact Admin for Activation</p>
+        <div class="bg-slate-800 p-4 rounded-lg mt-3">
+          <p class="text-sm text-slate-400 mb-2">For Quick Activation Contact:</p>
+          <p class="text-2xl font-bold text-cyan-400">03316035482</p>
+          <p class="text-yellow-400 font-bold mt-2">📸 Send Screenshot to this Number</p>
+          <p class="text-sm text-white mt-2">جس اکاؤنٹ سے پیسے بھیجے ہیں اس کا نمبر اور نام بھی اسی نمبر پر بھیجیں</p>
+          <p class="text-yellow-400 mt-2">Contact Admin for Activation</p>
         </div>
       </div>
     </div>
@@ -198,15 +200,13 @@
     currentUser = user; showDashboard();
   }
 
-  // DEPOSIT - UPDATED FUNCTION
+  // DEPOSIT
   function submitDeposit() {
     if(!depositTx.value) return alert('Enter Transaction ID');
     let email = localStorage.getItem('tempEmail');
     let reqs = getRequests();
     reqs.push({email: email, amount: 300, tx: depositTx.value, status: 'pending'});
     saveRequests(reqs);
-    
-    // YEH NAYA CODE HAI
     document.getElementById('depositSuccess').classList.remove('hidden');
     depositTx.value = '';
   }
