@@ -12,6 +12,7 @@
 .pic-card { background: #1e293b; padding: 12px; border-radius: 12px; text-align: center; }
 .star { font-size: 22px; cursor: pointer; color: #475569; transition: 0.2s; }
 .star.active { color: #facc15; }
+.checkbox { accent-color: #06b6d4; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -37,7 +38,7 @@
       <div id="registerForm" class="hidden">
         <input id="regName" type="text" placeholder="Full Name" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
         <input id="regEmail" type="email" placeholder="Email" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-        <input id="regNumber" type="text" placeholder="Phone Number" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+        <input id="regNumber" type="text" placeholder="Phone Number 03xxxxxxxxx" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
         <input id="regPass" type="password" placeholder="Password" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
         <button type="button" onclick="registerUser()" class="w-full py-3 bg-cyan-600 rounded-lg font-bold">Submit</button>
       </div>
@@ -57,8 +58,6 @@
       <label class="text-sm">Enter Transaction ID</label>
       <input id="depositTx" type="text" placeholder="TX ID Here" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
       <button type="button" onclick="submitDeposit()" class="w-full py-3 bg-green-600 rounded-lg font-bold">I Have Deposited</button>
-      
-      <!-- SUCCESS MESSAGE AFTER CLICK -->
       <div id="depositSuccess" class="hidden mt-4">
         <p class="text-green-400 flex items-center justify-center gap-2"><span>✅</span> Request Sent - Waiting for Admin Approval</p>
         <div class="bg-slate-800 p-4 rounded-lg mt-3">
@@ -93,13 +92,28 @@
     <div class="glass rounded-2xl p-6 mb-4 text-center">
       <p class="text-slate-400">Your Balance $</p>
       <p class="text-4xl font-bold text-green-400">$<span id="userBalance">0.00</span></p>
+      <p class="text-xs text-slate-400 mt-2">Referred: <span id="referCount">0</span> Friends | Earned: $<span id="referEarned">0.00</span></p>
     </div>
     <div class="grid grid-cols-2 gap-4">
-      <button onclick="alert('Coming Soon')" class="p-4 rounded-xl font-bold bg-yellow-600">ADD EARN</button>
+      <button onclick="showRefer()" class="p-4 rounded-xl font-bold bg-yellow-600">REFER & EARN</button>
       <button onclick="showTask()" class="p-4 rounded-xl font-bold bg-blue-600">DAILY TASK</button>
       <button onclick="showVideo()" class="p-4 rounded-xl font-bold bg-green-600">WATCH VIDEO</button>
-      <button onclick="alert('Invite Link: launchx.app/ref='+currentUser.email)" class="p-4 rounded-xl font-bold bg-purple-600">INVITE FRIEND</button>
+      <button onclick="alert('Coming Soon')" class="p-4 rounded-xl font-bold bg-purple-600">ADD EARN</button>
       <button onclick="showWithdraw()" class="p-4 rounded-xl font-bold bg-red-600 col-span-2">WITHDRAW</button>
+    </div>
+  </div>
+
+  <!-- REFER PAGE - NEW -->
+  <div id="referPage" class="hidden p-4 max-w-md mx-auto">
+    <div class="glass rounded-2xl p-6">
+      <h2 class="text-xl font-bold mb-2">Invite Friends & Earn $0.10</h2>
+      <p class="text-sm mb-4">جب آپ کا دوست 300 PKR deposit کرے گا تو آپ کو $0.10 ملیں گے</p>
+      <div class="bg-slate-800 p-3 rounded-lg mb-3">
+        <p class="text-xs mb-1">Your Referral Link:</p>
+        <p id="referLink" class="text-cyan-400 break-all"></p>
+      </div>
+      <button onclick="copyLink()" class="w-full py-3 bg-cyan-600 rounded-lg font-bold mb-3">📋 Copy Link</button>
+      <button onclick="showDashboard()" class="w-full py-2 bg-slate-700 rounded-lg">Back</button>
     </div>
   </div>
 
@@ -118,29 +132,40 @@
     </div>
   </div>
 
-  <!-- VIDEO PAGE -->
+  <!-- VIDEO PAGE - UPDATED WITH 3 CONDITIONS -->
   <div id="videoPage" class="hidden p-4 max-w-md mx-auto">
     <div class="glass rounded-2xl p-6">
       <h2 class="text-xl font-bold mb-2">Watch Video & Subscribe</h2>
-      <p class="text-red-400 text-xs mb-2">⚠️ SUBSCRIBE IT OTHERWISE YOU WILL NOT ABLE TO WITHDRAW ⚠️</p>
-      <p class="text-sm mb-4">Search <b>@abakKhan-w8k</b> on YouTube and Subscribe. Earn $0.05</p>
-      <button id="ytBtn" onclick="openYT()" class="w-full py-3 bg-red-600 rounded-lg font-bold mb-3">Go To @abakKhan-w8k</button>
-      <button onclick="claimVideo()" class="w-full py-3 bg-green-600 rounded-lg font-bold mb-3">I Subscribed - Claim $0.05</button>
+      <p class="text-red-400 text-xs mb-3">⚠️ SUBSCRIBE IT OTHERWISE YOU WILL NOT ABLE TO WITHDRAW ⚠️</p>
+
+      <div class="space-y-2 mb-4 text-sm">
+        <label class="flex items-center gap-2"><input type="checkbox" id="check1" class="checkbox"> 1. Video کو پورا دیکھیں</label>
+        <label class="flex items-center gap-2"><input type="checkbox" id="check2" class="checkbox"> 2. Channel کو Subscribe کریں</label>
+        <label class="flex items-center gap-2"><input type="checkbox" id="check3" class="checkbox"> 3. Bell Icon دبائیں</label>
+      </div>
+
+      <button id="ytBtn" onclick="openYT()" class="w-full py-3 bg-red-600 rounded-lg font-bold mb-3">▶️ Watch Video Now</button>
+      <button id="claimVideoBtn" onclick="claimVideo()" class="w-full py-3 bg-green-600 rounded-lg font-bold mb-3 opacity-50" disabled>I Subscribed - Claim $0.05</button>
       <button onclick="showDashboard()" class="w-full py-2 bg-slate-700 rounded-lg">Back</button>
       <p id="videoMsg" class="text-center mt-3 text-yellow-400"></p>
     </div>
   </div>
 
-  <!-- WITHDRAW PAGE -->
+  <!-- WITHDRAW PAGE - UPDATED VALIDATION -->
   <div id="withdrawPage" class="hidden p-4 max-w-md mx-auto">
     <div class="glass rounded-2xl p-6">
       <h2 class="text-xl font-bold mb-2">Withdraw</h2>
-      <p class="text-sm mb-4">Minimum Withdraw: $0.5</p>
-      <input id="withdrawMethod" type="text" placeholder="Method: JazzCash / Easypaisa" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-      <input id="withdrawNum" type="text" placeholder="Your Number" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
-      <input id="withdrawAmount" type="number" placeholder="Amount $" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+      <p class="text-sm mb-4">Minimum Withdraw: $0.5 | Available: $<span id="availableBal">0.00</span></p>
+      <select id="withdrawMethod" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+        <option value="">Select Method</option>
+        <option value="JazzCash">JazzCash</option>
+        <option value="Easypaisa">Easypaisa</option>
+      </select>
+      <input id="withdrawNum" type="text" placeholder="Your Number 03xxxxxxxxx" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+      <input id="withdrawAmount" type="number" step="0.01" placeholder="Amount $" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
       <button onclick="requestWithdraw()" class="w-full py-3 bg-red-600 rounded-lg font-bold mb-3">Request Withdraw</button>
       <button onclick="showDashboard()" class="w-full py-2 bg-slate-700 rounded-lg">Back</button>
+      <p id="withdrawMsg" class="text-center mt-3"></p>
     </div>
   </div>
 
@@ -152,7 +177,7 @@
     </div>
     <div class="glass rounded-2xl p-6 mb-4">
       <h2 class="text-xl mb-3">YouTube Link Settings</h2>
-      <input id="ytLink" type="text" value="https://youtube.com/@abakKhan-w8k" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
+      <input id="ytLink" type="text" value="https://youtube.com/shorts/PNsbWwa3Kwo?si=o_nJdsPS6TfjUEMh" class="w-full p-3 mb-3 rounded-lg bg-slate-800">
       <button onclick="saveYT()" class="px-4 py-2 bg-green-600 rounded-lg">Save Link</button>
     </div>
     <div class="glass rounded-2xl p-6">
@@ -167,6 +192,7 @@
   let ratedPics = 0;
   const ADMIN_EMAIL = "admin@launchx.com";
   const ADMIN_PASS = "admin123";
+  const YT_LINK = "https://youtube.com/shorts/PNsbWwa3Kwo?si=o_nJdsPS6TfjUEMh";
 
   function getUsers() { return JSON.parse(localStorage.getItem('users')) || []; }
   function saveUsers(users) { localStorage.setItem('users', JSON.stringify(users)); }
@@ -174,17 +200,25 @@
   function saveRequests(reqs) { localStorage.setItem('requests', JSON.stringify(reqs)); }
   function getData(key) { return JSON.parse(localStorage.getItem(key)) || {}; }
   function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
-  function getSetting(key) { return localStorage.getItem(key) || 'https://youtube.com/@abakKhan-w8k'; }
 
+  function validatePhone(num) {
+    return /^03\d{9}$/.test(num); // 03 + 9 digits
+  }
+
+  // USER AUTH
   function showLogin() { loginForm.classList.remove('hidden'); registerForm.classList.add('hidden'); loginTab.classList.add('tab-active'); registerTab.classList.remove('tab-active'); }
   function showRegister() { registerForm.classList.remove('hidden'); loginForm.classList.add('hidden'); registerTab.classList.add('tab-active'); loginTab.classList.remove('tab-active'); }
 
   function registerUser() {
     let users = getUsers();
-    if(!regName.value ||!regEmail.value ||!regPass.value) { authMessage.innerText = 'Please fill all fields'; authMessage.className = 'text-red-400'; return; }
+    if(!regName.value ||!regEmail.value ||!regPass.value ||!regNumber.value) { authMessage.innerText = 'Please fill all fields'; authMessage.className = 'text-red-400'; return; }
+    if(!validatePhone(regNumber.value)) { authMessage.innerText = 'Enter valid number: 03xxxxxxxxx'; authMessage.className = 'text-red-400'; return; }
     if(users.find(u => u.email === regEmail.value)) { authMessage.innerText = 'Email already exists'; authMessage.className = 'text-red-400'; return; }
-    users.push({name: regName.value, email: regEmail.value, number: regNumber.value, password: regPass.value, balance: 0.00, active: false});
+
+    let refBy = localStorage.getItem('refBy') || null;
+    users.push({name: regName.value, email: regEmail.value, number: regNumber.value, password: regPass.value, balance: 0.00, active: false, referredBy: refBy, referCount: 0, referEarned: 0});
     saveUsers(users);
+    localStorage.removeItem('refBy');
     authPage.classList.add('hidden');
     depositPage.classList.remove('hidden');
     localStorage.setItem('tempEmail', regEmail.value);
@@ -199,6 +233,7 @@
     currentUser = user; showDashboard();
   }
 
+  // DEPOSIT
   function submitDeposit() {
     if(!depositTx.value) return alert('Enter Transaction ID');
     let email = localStorage.getItem('tempEmail');
@@ -209,6 +244,7 @@
     depositTx.value = '';
   }
 
+  // ADMIN AUTH
   function showAdminLogin() { authPage.classList.add('hidden'); dashboardPage.classList.add('hidden'); adminLoginPage.classList.remove('hidden'); }
   function backToUserAuth() { adminLoginPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
   function adminLogin() {
@@ -219,19 +255,32 @@
   function adminLogout() { isAdmin = false; adminPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
 
   function showDashboard() {
-    authPage.classList.add('hidden'); adminLoginPage.classList.add('hidden'); depositPage.classList.add('hidden'); taskPage.classList.add('hidden'); videoPage.classList.add('hidden'); withdrawPage.classList.add('hidden'); adminPage.classList.add('hidden');
+    authPage.classList.add('hidden'); adminLoginPage.classList.add('hidden'); depositPage.classList.add('hidden'); taskPage.classList.add('hidden'); videoPage.classList.add('hidden'); withdrawPage.classList.add('hidden'); adminPage.classList.add('hidden'); referPage.classList.add('hidden');
     dashboardPage.classList.remove('hidden');
     userName.innerText = currentUser.name; userBalance.innerText = currentUser.balance.toFixed(2);
+    referCount.innerText = currentUser.referCount || 0;
+    referEarned.innerText = (currentUser.referEarned || 0).toFixed(2);
   }
   function logout() { currentUser = null; dashboardPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
 
+  // REFER SYSTEM
+  function showRefer() {
+    dashboardPage.classList.add('hidden'); referPage.classList.remove('hidden');
+    referLink.innerText = window.location.origin + '?ref=' + currentUser.email;
+  }
+  function copyLink() {
+    navigator.clipboard.writeText(referLink.innerText);
+    alert('✅ Link Copied!');
+  }
+
+  // DAILY TASK
   function showTask() {
     dashboardPage.classList.add('hidden'); taskPage.classList.remove('hidden'); ratedPics = 0;
     let today = new Date().toDateString();
     let claims = getData('taskClaims');
-    if(claims[currentUser.email] === today) { taskMsg.innerText = '⚠️ You already completed today'; claimBtn.disabled = true; claimBtn.classList.add('opacity-50'); } 
+    if(claims[currentUser.email] === today) { taskMsg.innerText = '⚠️ You already completed today'; claimBtn.disabled = true; claimBtn.classList.add('opacity-50'); }
     else { taskMsg.innerText = ''; claimBtn.disabled = false; claimBtn.classList.remove('opacity-50'); }
-    
+
     updateProgress();
     picGrid.innerHTML = '';
     for(let i=1; i<=10; i++) {
@@ -260,7 +309,7 @@
       }
     })
   }
-  
+
   function updateProgress() {
     taskProgress.innerText = `${ratedPics} of 10 completed`;
     progressBar.style.width = `${ratedPics * 10}%`;
@@ -275,8 +324,21 @@
     showDashboard();
   }
 
-  function showVideo() { dashboardPage.classList.add('hidden'); videoPage.classList.remove('hidden'); videoMsg.innerText = ''; }
-  function openYT() { window.open(getSetting('ytLink'), '_blank'); }
+  // VIDEO WITH 3 CONDITIONS
+  function showVideo() {
+    dashboardPage.classList.add('hidden'); videoPage.classList.remove('hidden'); videoMsg.innerText = '';
+    check1.checked = false; check2.checked = false; check3.checked = false;
+    claimVideoBtn.disabled = true; claimVideoBtn.classList.add('opacity-50');
+    [check1, check2, check3].forEach(cb => cb.onchange = enableClaimBtn);
+  }
+  function enableClaimBtn() {
+    if(check1.checked && check2.checked && check3.checked) {
+      claimVideoBtn.disabled = false; claimVideoBtn.classList.remove('opacity-50');
+    } else {
+      claimVideoBtn.disabled = true; claimVideoBtn.classList.add('opacity-50');
+    }
+  }
+  function openYT() { window.open(YT_LINK, '_blank'); }
   function claimVideo() {
     let claims = getData('videoClaims');
     let today = new Date().toDateString();
@@ -291,17 +353,34 @@
     userBalance.innerText = user.balance.toFixed(2);
   }
 
-  function showWithdraw() { dashboardPage.classList.add('hidden'); withdrawPage.classList.remove('hidden'); }
+  // WITHDRAW WITH VALIDATION
+  function showWithdraw() {
+    dashboardPage.classList.add('hidden'); withdrawPage.classList.remove('hidden');
+    availableBal.innerText = currentUser.balance.toFixed(2);
+    withdrawMsg.innerText = '';
+  }
   function requestWithdraw() {
-    if(withdrawAmount.value < 0.5) return alert('Minimum $0.5');
-    if(!withdrawMethod.value ||!withdrawNum.value) return alert('Enter Method and Number');
-    alert(`Withdraw Request Sent\nMethod: ${withdrawMethod.value}\nNumber: ${withdrawNum.value}\nAmount: $${withdrawAmount.value}`);
+    let amount = parseFloat(withdrawAmount.value);
+    if(!withdrawMethod.value) return withdrawMsg.innerText = '❌ Select Method';
+    if(!validatePhone(withdrawNum.value)) return withdrawMsg.innerText = '❌ Enter valid number: 03xxxxxxxxx';
+    if(isNaN(amount) || amount < 0.5) return withdrawMsg.innerText = '❌ Minimum $0.5';
+    if(amount > currentUser.balance) return withdrawMsg.innerText = `❌ Insufficient Balance. You have $${currentUser.balance.toFixed(2)}`;
+
+    let users = getUsers();
+    let user = users.find(u => u.email === currentUser.email);
+    user.balance -= amount;
+    saveUsers(users);
+    currentUser = user;
+
+    alert(`✅ Withdraw Request Sent\nMethod: ${withdrawMethod.value}\nNumber: ${withdrawNum.value}\nAmount: $${amount}`);
     withdrawAmount.value = ''; withdrawNum.value = ''; withdrawMethod.value = '';
+    showDashboard();
   }
 
-  function showAdminPanel() { adminLoginPage.classList.add('hidden'); adminPage.classList.remove('hidden'); ytLink.value = getSetting('ytLink'); loadRequests(); }
-  function saveYT() { localStorage.setItem('ytLink', ytLink.value); adminMsg.innerText = '✅ YouTube Link Saved!'; adminMsg.className = 'text-green-400'; }
-  
+  // ADMIN PANEL
+  function showAdminPanel() { adminLoginPage.classList.add('hidden'); adminPage.classList.remove('hidden'); ytLink.value = YT_LINK; loadRequests(); }
+  function saveYT() { localStorage.setItem('ytLink', ytLink.value); alert('✅ YouTube Link Saved!'); }
+
   function loadRequests() {
     let reqs = getRequests().filter(r => r.status === 'pending');
     let html = '';
@@ -322,12 +401,30 @@
     let req = reqs[index];
     let users = getUsers();
     let user = users.find(u => u.email === req.email);
-    if(user) user.active = true;
-    saveUsers(users);
+    if(user) {
+      user.active = true;
+      // REFERRAL BONUS
+      if(user.referredBy) {
+        let refUser = users.find(u => u.email === user.referredBy);
+        if(refUser) {
+          refUser.referCount += 1;
+          refUser.referEarned += 0.10;
+          refUser.balance += 0.10;
+        }
+      }
+      saveUsers(users);
+    }
     reqs.splice(index, 1);
     saveRequests(reqs);
-    alert('✅ User Activated!');
+    alert('✅ User Activated! Referral Bonus Given');
     loadRequests();
+  }
+
+  // Check for referral link on page load
+  window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref');
+    if(ref) localStorage.setItem('refBy', ref);
   }
 </script>
 </body>
