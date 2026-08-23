@@ -7,11 +7,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
- .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
- .tab-active { background: #06b6d4!important; }
- .pic-card { background: #1e293b; padding: 12px; border-radius: 12px; text-align: center; }
- .star { font-size: 22px; cursor: pointer; color: #475569; transition: 0.2s; }
- .star.active { color: #facc15; }
+.glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+.tab-active { background: #06b6d4!important; }
+.pic-card { background: #1e293b; padding: 12px; border-radius: 12px; text-align: center; }
+.star { font-size: 22px; cursor: pointer; color: #475569; transition: 0.2s; }
+.star.active { color: #facc15; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -45,7 +45,7 @@
     </div>
   </div>
 
-  <!-- DEPOSIT PAGE -->
+  <!-- DEPOSIT PAGE - UPDATED -->
   <div id="depositPage" class="hidden flex items-center justify-center p-4">
     <div class="glass rounded-2xl p-8 w-full max-w-md text-center">
       <h2 class="text-2xl font-bold mb-4 text-yellow-400">Account Activation Fee</h2>
@@ -57,7 +57,16 @@
       <label class="text-sm">Enter Transaction ID</label>
       <input id="depositTx" type="text" placeholder="TX ID Here" class="w-full p-3 mb-4 rounded-lg bg-slate-800">
       <button type="button" onclick="submitDeposit()" class="w-full py-3 bg-green-600 rounded-lg font-bold">I Have Deposited</button>
-      <p id="depositMsg" class="text-center mt-4 text-yellow-400"></p>
+      
+      <!-- YEH NAYA DIV HAI -->
+      <div id="depositSuccess" class="hidden mt-4">
+        <p class="text-green-400 flex items-center justify-center gap-2"><span>✅</span> Request Sent - Waiting for Admin Approval</p>
+        <div class="bg-slate-800 p-3 rounded-lg mt-3">
+          <p class="text-sm text-slate-400">For Quick Activation Contact:</p>
+          <p class="text-xl font-bold text-cyan-400">03316035482</p>
+          <p class="text-yellow-400">Contact Admin for Activation</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -92,7 +101,7 @@
     </div>
   </div>
 
-  <!-- DAILY TASK PAGE - NEW DESIGN -->
+  <!-- DAILY TASK PAGE -->
   <div id="taskPage" class="hidden p-4 max-w-4xl mx-auto">
     <div class="glass rounded-2xl p-6">
       <h2 class="text-2xl font-bold mb-1">Daily Tasks</h2>
@@ -189,14 +198,16 @@
     currentUser = user; showDashboard();
   }
 
-  // DEPOSIT
+  // DEPOSIT - UPDATED FUNCTION
   function submitDeposit() {
     if(!depositTx.value) return alert('Enter Transaction ID');
     let email = localStorage.getItem('tempEmail');
     let reqs = getRequests();
     reqs.push({email: email, amount: 300, tx: depositTx.value, status: 'pending'});
     saveRequests(reqs);
-    depositMsg.innerText = '✅ Request Sent - Waiting for Admin Approval';
+    
+    // YEH NAYA CODE HAI
+    document.getElementById('depositSuccess').classList.remove('hidden');
     depositTx.value = '';
   }
 
@@ -217,7 +228,7 @@
   }
   function logout() { currentUser = null; dashboardPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
 
-  // DAILY TASK - NEW
+  // DAILY TASK
   function showTask() {
     dashboardPage.classList.add('hidden'); taskPage.classList.remove('hidden'); ratedPics = 0;
     let today = new Date().toDateString();
