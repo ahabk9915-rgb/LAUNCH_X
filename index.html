@@ -6,13 +6,14 @@
   <title>Launch X - Supabase</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root{--bg:#0b0f14;--card:#111827;--muted:#94a3b8;--text:#e5e7eb;--brand:#3b82f6;--brand2:#22c55e;--warn:#f59e0b;--red:#ef4444;--purple:#7c3aed}
+    :root{--bg:#0b0f14;--card:#111827;--muted:#94a3b8;--text:#e5e7eb;--brand:#3b82f6;--brand2:#22c55e;--warn:#f59e0b;--red:#ef4444;--purple:#7c3aed;--wa:#25D366}
     *{box-sizing:border-box}body{margin:0;font-family:system-ui;background:linear-gradient(180deg,#0b0f14,#0a0a0a);color:var(--text)}
     .container{max-width:900px;margin:0 auto;padding:24px}
-    .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:20px}
+    .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:20px;margin-bottom:16px}
     h1{font-size:28px;margin:0 0 8px} p{color:var(--muted);margin:0 0 16px}
-    .btn{padding:20px;border-radius:16px;border:1px solid #243244;background:#0f172a;color:#fff;font-weight:700;cursor:pointer;width:100%;margin-bottom:12px}
-    .btn.brand{background:var(--brand)}.btn.green{background:var(--brand2)}.btn.red{background:var(--red)}.btn.yellow{background:var(--warn);color:#111}.btn.purple{background:var(--purple)}
+    .btn{padding:18px;border-radius:16px;border:1px solid #243244;background:#0f172a;color:#fff;font-weight:700;cursor:pointer;width:100%;margin-bottom:12px;font-size:16px}
+    .btn:hover{background:#1e293b}
+    .btn.brand{background:var(--brand)}.btn.green{background:var(--brand2)}.btn.red{background:var(--red)}.btn.yellow{background:var(--warn);color:#111}.btn.purple{background:var(--purple)}.btn.wa{background:var(--wa)}
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     .field{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
     .field input{padding:12px;border-radius:10px;border:1px solid #243244;background:#0b1220;color:#fff;width:100%}
@@ -21,6 +22,7 @@
     .balance-box{background:linear-gradient(135deg,#3b82f6,#22c55e);padding:20px;border-radius:12px;text-align:center}
     .balance-amount{font-size:36px;font-weight:900;color:#fff}.user-card{background:#0b1220;padding:12px;border-radius:10px;margin:10px 0}
     .warn-note{color:#f59e0b;background:#1e293b;padding:10px;border-radius:8px}
+    .wa-box{background:#25D366;padding:12px;border-radius:10px;text-align:center;margin-top:16px}
   </style>
 </head>
 <body>
@@ -31,6 +33,10 @@
       <button class="btn green" id="toRegister">Create Account</button>
       <button class="btn brand" id="toLogin">Login</button>
       <button class="btn purple" id="toAdmin">🔐 Admin Panel</button>
+      <div class="wa-box">
+        <b>Need Help?</b><br>
+        <a href="https://wa.me/923316035482" target="_blank" style="color:#fff;text-decoration:none">WhatsApp Support: 0331 6035482</a>
+      </div>
     </section>
 
     <section id="register" class="card hidden">
@@ -101,6 +107,7 @@
 
   function show(id){ ['home','register','login','deposit','pending','dashboard','admin'].forEach(s => $(s).classList.add('hidden')); $(id).classList.remove('hidden'); }
 
+  // BUTTONS FIXED
   $('toRegister').onclick = () => show('register');
   $('toLogin').onclick = () => show('login'); 
   $('backHome1').onclick = () => show('home');
@@ -111,7 +118,7 @@
   // REGISTER
   $('regForm').onsubmit = async e => {
     e.preventDefault();
-    const { data, error } = await supabase.from('users').insert([{
+    const { error } = await supabase.from('users').insert([{
       name: $('regForm').name.value,
       email: $('regForm').email.value,
       number: $('regForm').number.value,
@@ -140,11 +147,12 @@
     } else { alert("Wrong Email or Password!"); }
   }
 
-  // DEPOSIT REQUEST
+  // DEPOSIT
   $('depositForm').onsubmit = async e => {
     e.preventDefault();
-    const email = $('loginForm').email.value || currentUser.email;
+    const email = currentUser.email;
     await supabase.from('pending_deposits').insert([{ user_email: email, tx_id: $('depositForm').txid.value }]);
+    alert("Request sent! Admin approval ka wait karein");
     show('pending');
   }
 
@@ -155,11 +163,10 @@
     if(email === 'admin@launchx.com' && pass === 'admin123'){
       loadAdmin();
       show('admin');
-    } else { alert('Wrong!'); }
+    } else { alert('Wrong Email or Password!'); }
   }
 
   async function loadAdmin(){
-    // Pending Deposits
     const { data: pending } = await supabase.from('pending_deposits').select('*').eq('status', 'pending');
     let html = '';
     pending.forEach(p => {
@@ -172,7 +179,6 @@
     });
     $('pendingList').innerHTML = html || 'No pending requests';
 
-    // All Users
     const { data: users } = await supabase.from('users').select('*');
     let usersHtml = '';
     users.forEach(u => {
@@ -181,7 +187,6 @@
     $('usersList').innerHTML = usersHtml;
   }
 
-  // APPROVE FUNCTION
   window.approveUser = async (email, depositId) => {
     await supabase.from('users').update({ balance: 300, is_active: true }).eq('email', email);
     await supabase.from('pending_deposits').update({ status: 'approved' }).eq('id', depositId);
