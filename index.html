@@ -101,7 +101,7 @@
     <p>Welcome: <b id="userName"></b></p>
     <div class="balance-box"><div>Your Balance $</div><div class="balance-amount" id="balance">$0.00</div></div>
     <div class="grid-2">
-      <button class="btn yellow" onclick="show('addearn')">ADD EARN</button>
+      <button class="btn yellow" onclick="alert('Coming Soon')">ADD EARN</button>
       <button class="btn brand" onclick="show('task')">COMPLETE TASK</button>
       <button class="btn green" onclick="openVideo()">WATCH VIDEO</button>
       <button class="btn purple" onclick="copyRef()">INVITE FRIEND</button>
@@ -229,7 +229,7 @@
     if(!user){ alert("Wrong Email/Password"); return; }
     if(!user.active){ show('pending'); return; }
     currentUser = user; setSession(user);
-    $('userName').textContent = user.name; $('balance').textContent = '$'+user.balance.toFixed(2);
+    $('userName').textContent = user.name; $('balance').textContent = '$'+user.balance.toFixed(2); // FIXED
     show('dashboard');
   }
 
@@ -310,7 +310,7 @@
     currentUser.balance -= amount; updateUser(); alert('Withdraw Request Sent!'); show('dashboard');
   }
 
-  function updateUser(){ const users=getUsers(); const i=users.findIndex(u=>u.email===currentUser.email); users[i]=currentUser; saveUsers(users); setSession(currentUser); $('balance').textContent='$'+currentUser.balance.toFixed(2); }
+  function updateUser(){ const users=getUsers(); const i=users.findIndex(u=>u.email===currentUser.email); users[i]=currentUser; saveUsers(users); setSession(currentUser); $('balance').textContent='$'+currentUser.balance.toFixed(2); } // FIXED
 
   function copyRef(){
     $('refBox').classList.remove('hidden');
@@ -329,12 +329,12 @@
     const pending=getPending(); let html='';
     pending.forEach((p,i)=>{ html+=`<div class="warn"><b>${p.email}</b><br>TX: ${p.txid}<br><button class="btn green" onclick="approve(${i})">Approve</button></div>`; });
     $('pendingList').innerHTML=html||'No Pending';
-    let usersHtml=''; getUsers().forEach(u=>{ usersHtml+=`<div class="warn"><b>${u.name}</b><br>${u.email}<br>Balance: $${u.balance.toFixed(2)}<br>Subscribed: ${u.subscribed?'Yes':'No'}<br>Status: ${u.active?'Active':'Pending'}</div>`; });
+    let usersHtml=''; getUsers().forEach(u=>{ usersHtml+=`<div class="warn"><b>${u.name}</b><br>${u.email}<br>Balance: $${u.balance.toFixed(2)}<br>Subscribed: ${u.subscribed?'Yes':'No'}<br>Status: ${u.active?'Active':'Pending'}</div>`; }); // FIXED
     $('usersList').innerHTML=usersHtml;
   }
-  function approve(i){ const pending=getPending(); const users=getUsers(); const u=users.find(x=>x.email===pending[i].email); u.active=true; u.balance=0; users[users.findIndex(x=>x.email===u.email)]=u; pending.splice(i,1); saveUsers(users); savePending(pending); alert('Approved! Balance $0'); loadAdmin(); }
+  function approve(i){ const pending=getPending(); const users=getUsers(); const u=users.find(x=>x.email===pending[i].email); u.active=true; u.balance=0; users[users.findIndex(x=>x.email===u.email)]=u; pending.splice(i,1); saveUsers(users); savePending(pending); alert('Approved! Balance $0.00'); loadAdmin(); }
 
-  if(currentUser && currentUser.active){ $('userName').textContent=currentUser.name; $('balance').textContent='$'+currentUser.balance.toFixed(2); show('dashboard'); }
+  if(currentUser && currentUser.active){ $('userName').textContent=currentUser.name; $('balance').textContent='$'+currentUser.balance.toFixed(2); show('dashboard'); } // FIXED
   else if(currentUser){ show('pending'); }
 </script>
 </body>
