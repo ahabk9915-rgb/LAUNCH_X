@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Investment Platform</title>
+  <title>Launch X</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
     .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+    .tab-active { background: #06b6d4 !important; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -18,28 +19,28 @@
     <div class="glass rounded-2xl p-8 w-full max-w-md">
       <h1 class="text-3xl font-bold text-center mb-6 text-cyan-400">Launch X</h1>
       
-      <div id="authTabs" class="flex gap-2 mb-6">
-        <button onclick="showLogin()" id="loginTab" class="flex-1 py-2 rounded-lg bg-cyan-600">Login</button>
-        <button onclick="showRegister()" id="registerTab" class="flex-1 py-2 rounded-lg bg-slate-700">Register</button>
+      <div class="flex gap-2 mb-6">
+        <button onclick="showLogin()" id="loginTab" class="flex-1 py-2 rounded-lg bg-slate-700">Login</button>
+        <button onclick="showRegister()" id="registerTab" class="flex-1 py-2 rounded-lg bg-slate-700 tab-active">Register</button>
       </div>
 
       <!-- REGISTER FORM -->
       <form id="registerForm" onsubmit="registerUser(event)">
-        <input id="regName" type="text" placeholder="Full Name" required class="w-full p-3 mb-3 rounded-lg bg-slate-800 border-slate-700">
+        <input id="regName" type="text" placeholder="Full Name" required class="w-full p-3 mb-3 rounded-lg bg-slate-800 border border-slate-700">
         <input id="regEmail" type="email" placeholder="Email" required class="w-full p-3 mb-3 rounded-lg bg-slate-800 border-slate-700">
-        <input id="regNumber" type="text" placeholder="Phone Number" class="w-full p-3 mb-3 rounded-lg bg-slate-800 border-slate-700">
+        <input id="regNumber" type="text" placeholder="Phone Number" class="w-full p-3 mb-3 rounded-lg bg-slate-800 border border-slate-700">
         <input id="regPass" type="password" placeholder="Password" required class="w-full p-3 mb-4 rounded-lg bg-slate-800 border-slate-700">
         <button type="submit" class="w-full py-3 bg-cyan-600 rounded-lg font-bold hover:bg-cyan-700">Create Account</button>
       </form>
 
       <!-- LOGIN FORM -->
       <form id="loginForm" onsubmit="loginUser(event)" class="hidden">
-        <input id="loginEmail" type="email" placeholder="Email" required class="w-full p-3 mb-3 rounded-lg bg-slate-800 border border-slate-700">
+        <input id="loginEmail" type="email" placeholder="Email" required class="w-full p-3 mb-3 rounded-lg bg-slate-800 border-slate-700">
         <input id="loginPass" type="password" placeholder="Password" required class="w-full p-3 mb-4 rounded-lg bg-slate-800 border border-slate-700">
         <button type="submit" class="w-full py-3 bg-cyan-600 rounded-lg font-bold hover:bg-cyan-700">Login</button>
       </form>
       
-      <p id="authMessage" class="text-center mt-4 text-sm"></p>
+      <p id="authMessage" class="text-center mt-4 text-sm text-green-400"></p>
     </div>
   </div>
 
@@ -54,26 +55,32 @@
       <p class="text-slate-400">Your Balance</p>
       <p class="text-4xl font-bold text-green-400">$<span id="userBalance">0</span></p>
     </div>
-
-    <div class="glass rounded-2xl p-6">
-      <h2 class="text-xl font-bold mb-4">Submit Deposit Request</h2>
-      <form onsubmit="submitDeposit(event)">
-        <input id="depositAmount" type="number" placeholder="Amount $" required class="w-full p-3 mb-3 rounded-lg bg-slate-800 border-slate-700">
-        <input id="depositTx" type="text" placeholder="Transaction ID" class="w-full p-3 mb-3 rounded-lg bg-slate-800 border-slate-700">
-        <button type="submit" class="w-full py-3 bg-green-600 rounded-lg font-bold">Submit Request</button>
-      </form>
-    </div>
   </div>
 
 <script>
-  // ====== YE APKI KEYS HAIN ======
+  // ====== APKI KEYS ======
   const SUPABASE_URL = 'https://bvgmcrqenrqtaedbaqav.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_4V777hQQNT5kYx6nCmR7Sw_vqH9B3QO';
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let currentUser = null;
 
-  // --- AUTH FUNCTIONS ---
+  // --- TAB SWITCH ---
+  function showLogin() {
+    document.getElementById('loginForm').classList.remove('hidden');
+    document.getElementById('registerForm').classList.add('hidden');
+    document.getElementById('loginTab').classList.add('tab-active');
+    document.getElementById('registerTab').classList.remove('tab-active');
+  }
+
+  function showRegister() {
+    document.getElementById('registerForm').classList.remove('hidden');
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('registerTab').classList.add('tab-active');
+    document.getElementById('loginTab').classList.remove('tab-active');
+  }
+
+  // --- REGISTER ---
   async function registerUser(e) {
     e.preventDefault();
     const name = document.getElementById('regName').value;
@@ -81,15 +88,20 @@
     const number = document.getElementById('regNumber').value;
     const password = document.getElementById('regPass').value;
 
-    const { data, error } = await supabase.from('users').insert([{ name, email, number, password }]);
+    const { error } = await supabase.from('users').insert([{ name, email, number, password, balance: 0 }]);
     
     if(error) {
       document.getElementById('authMessage').innerText = 'Error: ' + error.message;
+      document.getElementById('authMessage').classList.remove('text-green-400');
+      document.getElementById('authMessage').classList.add('text-red-400');
     } else {
-      document.getElementById('authMessage').innerText = 'Account Created Successfully! ✅';
+      document.getElementById('authMessage').innerText = 'Account Created Successfully! ✅ Now Login';
+      document.getElementById('authMessage').classList.add('text-green-400');
+      document.getElementById('registerForm').reset();
     }
   }
 
+  // --- LOGIN ---
   async function loginUser(e) {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
@@ -99,6 +111,7 @@
     
     if(error || !data) {
       document.getElementById('authMessage').innerText = 'Invalid Email or Password';
+      document.getElementById('authMessage').classList.add('text-red-400');
     } else {
       currentUser = data;
       showDashboard();
@@ -117,30 +130,6 @@
     document.getElementById('dashboardPage').classList.add('hidden');
     document.getElementById('authPage').classList.remove('hidden');
   }
-
-  function showLogin() {
-    document.getElementById('loginForm').classList.remove('hidden');
-    document.getElementById('registerForm').classList.add('hidden');
-    document.getElementById('loginTab').classList.add('bg-cyan-600');
-    document.getElementById('registerTab').classList.remove('bg-cyan-600');
-  }
-
-  function showRegister() {
-    document.getElementById('registerForm').classList.remove('hidden');
-    document.getElementById('loginForm').classList.add('hidden');
-    document.getElementById('registerTab').classList.add('bg-cyan-600');
-    document.getElementById('loginTab').classList.remove('bg-cyan-600');
-  }
-
-  async function submitDeposit(e) {
-    e.preventDefault();
-    const amount = document.getElementById('depositAmount').value;
-    const tx_id = document.getElementById('depositTx').value;
-    
-    await supabase.from('pending_deposits').insert([{ user_email: currentUser.email, amount, tx_id }]);
-    alert('Deposit Request Submitted!');
-  }
 </script>
 </body>
 </html>
-
