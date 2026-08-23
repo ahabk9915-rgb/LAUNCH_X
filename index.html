@@ -9,8 +9,8 @@
     body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
  .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
  .tab-active { background: #06b6d4!important; }
- .pic-card { background: #1e293b; padding: 10px; border-radius: 10px; text-align: center; }
- .star { font-size: 20px; cursor: pointer; color: #475569; }
+ .pic-card { background: #1e293b; padding: 12px; border-radius: 12px; text-align: center; }
+ .star { font-size: 22px; cursor: pointer; color: #475569; transition: 0.2s; }
  .star.active { color: #facc15; }
   </style>
 </head>
@@ -45,7 +45,7 @@
     </div>
   </div>
 
-  <!-- DEPOSIT PAGE - NEW -->
+  <!-- DEPOSIT PAGE -->
   <div id="depositPage" class="hidden flex items-center justify-center p-4">
     <div class="glass rounded-2xl p-8 w-full max-w-md text-center">
       <h2 class="text-2xl font-bold mb-4 text-yellow-400">Account Activation Fee</h2>
@@ -85,19 +85,22 @@
     </div>
     <div class="grid grid-cols-2 gap-4">
       <button onclick="alert('Coming Soon')" class="p-4 rounded-xl font-bold bg-yellow-600">ADD EARN</button>
-      <button onclick="showTask()" class="p-4 rounded-xl font-bold bg-blue-600">COMPLETE TASK</button>
+      <button onclick="showTask()" class="p-4 rounded-xl font-bold bg-blue-600">DAILY TASK</button>
       <button onclick="showVideo()" class="p-4 rounded-xl font-bold bg-green-600">WATCH VIDEO</button>
       <button onclick="alert('Invite Link: launchx.app/ref='+currentUser.email)" class="p-4 rounded-xl font-bold bg-purple-600">INVITE FRIEND</button>
       <button onclick="showWithdraw()" class="p-4 rounded-xl font-bold bg-red-600 col-span-2">WITHDRAW</button>
     </div>
   </div>
 
-  <!-- TASK PAGE -->
-  <div id="taskPage" class="hidden p-4 max-w-2xl mx-auto">
+  <!-- DAILY TASK PAGE - NEW DESIGN -->
+  <div id="taskPage" class="hidden p-4 max-w-4xl mx-auto">
     <div class="glass rounded-2xl p-6">
-      <h2 class="text-xl font-bold mb-2">Daily Task - Rate 10 Pics</h2>
-      <p class="text-sm mb-4">1 Pic = $0.001 | Total 10 Pics = $0.01</p>
-      <div id="picGrid" class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4"></div>
+      <h2 class="text-2xl font-bold mb-1">Daily Tasks</h2>
+      <p class="text-sm text-slate-400 mb-4">Complete tasks to earn rewards | <span id="taskProgress">0 of 10 completed</span></p>
+      <div class="w-full bg-slate-700 rounded-full h-2.5 mb-6">
+        <div id="progressBar" class="bg-green-500 h-2.5 rounded-full" style="width: 0%"></div>
+      </div>
+      <div id="picGrid" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4"></div>
       <button id="claimBtn" onclick="claimTask()" class="w-full py-3 bg-green-600 rounded-lg font-bold">Claim $0.01</button>
       <button onclick="showDashboard()" class="w-full py-2 mt-3 bg-slate-700 rounded-lg">Back</button>
       <p id="taskMsg" class="text-center mt-3 text-yellow-400"></p>
@@ -109,7 +112,7 @@
     <div class="glass rounded-2xl p-6">
       <h2 class="text-xl font-bold mb-2">Watch Video & Subscribe</h2>
       <p class="text-red-400 text-xs mb-2">⚠️ SUBSCRIBE IT OTHERWISE YOU WILL NOT ABLE TO WITHDRAW ⚠️</p>
-      <p class="text-sm mb-4">Hamara YouTube Channel Subscribe karen aur $0.05 earn karen</p>
+      <p class="text-sm mb-4">Search <b>@abakKhan-w8k</b> on YouTube and Subscribe. Earn $0.05</p>
       <button id="ytBtn" onclick="openYT()" class="w-full py-3 bg-red-600 rounded-lg font-bold mb-3">Go To @abakKhan-w8k</button>
       <button onclick="claimVideo()" class="w-full py-3 bg-green-600 rounded-lg font-bold mb-3">I Subscribed - Claim $0.05</button>
       <button onclick="showDashboard()" class="w-full py-2 bg-slate-700 rounded-lg">Back</button>
@@ -150,6 +153,7 @@
 <script>
   let currentUser = null;
   let isAdmin = false;
+  let ratedPics = 0;
   const ADMIN_EMAIL = "admin@launchx.com";
   const ADMIN_PASS = "admin123";
 
@@ -171,7 +175,6 @@
     if(users.find(u => u.email === regEmail.value)) { authMessage.innerText = 'Email already exists'; authMessage.className = 'text-red-400'; return; }
     users.push({name: regName.value, email: regEmail.value, number: regNumber.value, password: regPass.value, balance: 0.00, active: false});
     saveUsers(users);
-    // NEW: Go to Deposit Page after register
     authPage.classList.add('hidden');
     depositPage.classList.remove('hidden');
     localStorage.setItem('tempEmail', regEmail.value);
@@ -214,37 +217,54 @@
   }
   function logout() { currentUser = null; dashboardPage.classList.add('hidden'); authPage.classList.remove('hidden'); }
 
-  // TASK
+  // DAILY TASK - NEW
   function showTask() {
-    dashboardPage.classList.add('hidden'); taskPage.classList.remove('hidden');
+    dashboardPage.classList.add('hidden'); taskPage.classList.remove('hidden'); ratedPics = 0;
     let today = new Date().toDateString();
     let claims = getData('taskClaims');
-    if(claims[currentUser.email] === today) { taskMsg.innerText = '⚠️ You already claimed today'; claimBtn.disabled = true; claimBtn.classList.add('opacity-50'); } 
+    if(claims[currentUser.email] === today) { taskMsg.innerText = '⚠️ You already completed today'; claimBtn.disabled = true; claimBtn.classList.add('opacity-50'); } 
     else { taskMsg.innerText = ''; claimBtn.disabled = false; claimBtn.classList.remove('opacity-50'); }
     
+    updateProgress();
     picGrid.innerHTML = '';
     for(let i=1; i<=10; i++) {
       let stars = '';
-      for(let s=1; s<=5; s++) stars += `<span class="star" onclick="rateStar(${i},${s})">★</span>`;
-      picGrid.innerHTML += `<div class="pic-card"><p>Pic ${i}</p><div id="stars-${i}">${stars}</div></div>`;
+      for(let s=1; s<=5; s++) stars += `<span class="star" data-pic="${i}" data-star="${s}">★</span>`;
+      picGrid.innerHTML += `<div class="pic-card"><p class="mb-2">Task #${i}</p><div id="stars-${i}" class="flex justify-center gap-1">${stars}</div><p class="text-xs mt-2 text-green-400" id="earned-${i}"></p></div>`;
     }
+    document.querySelectorAll('.star').forEach(star => {
+      star.onclick = function() {
+        let pic = this.dataset.pic;
+        let s = this.dataset.star;
+        if(document.querySelectorAll(`#stars-${pic}.star.active`).length >= 5) return;
+        let stars = document.querySelectorAll(`#stars-${pic}.star`);
+        stars.forEach((st, i) => st.classList.toggle('active', i < s));
+        if(s == 5 &&!this.parentElement.dataset.done) {
+          this.parentElement.dataset.done = true;
+          ratedPics++;
+          let users = getUsers();
+          let user = users.find(u => u.email === currentUser.email);
+          user.balance += 0.001;
+          saveUsers(users);
+          document.getElementById(`earned-${pic}`).innerText = '+$0.001 earned';
+          userBalance.innerText = user.balance.toFixed(2);
+          updateProgress();
+        }
+      }
+    })
   }
-  function rateStar(pic, star) {
-    let stars = document.querySelectorAll(`#stars-${pic}.star`);
-    stars.forEach((s, i) => s.classList.toggle('active', i < star));
+  
+  function updateProgress() {
+    taskProgress.innerText = `${ratedPics} of 10 completed`;
+    progressBar.style.width = `${ratedPics * 10}%`;
   }
+
   function claimTask() {
-    let rated = 0;
-    for(let i=1; i<=10; i++) { if(document.querySelectorAll(`#stars-${i}.star.active`).length === 5) rated++; }
-    if(rated < 10) return alert('Please give 5 stars to all 10 pictures');
-    let users = getUsers();
-    let user = users.find(u => u.email === currentUser.email);
-    user.balance += 0.01;
-    saveUsers(users);
+    if(ratedPics < 10) return alert('Please complete all 10 tasks');
     let claims = getData('taskClaims');
     claims[currentUser.email] = new Date().toDateString();
     saveData('taskClaims', claims);
-    alert('✅ $0.01 Added!');
+    alert('✅ Daily Task Completed! +$0.01 Total');
     showDashboard();
   }
 
@@ -262,6 +282,7 @@
     claims[currentUser.email] = today;
     saveData('videoClaims', claims);
     videoMsg.innerText = '✅ $0.05 Added!';
+    userBalance.innerText = user.balance.toFixed(2);
   }
 
   // WITHDRAW
