@@ -1,70 +1,80 @@
-<?php
-session_start();
-$conn = new mysqli("localhost","id_xxxxx","pass","id_xxxxx_launchx_db");
-
-$page = $_GET['page'] ?? 'home';
-?>
 <!DOCTYPE html>
-<html>
+<html lang="ur">
 <head>
-<title>LaunchX Earning Hub</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HDM Earning - Front Page</title>
 <style>
-body{font-family:Arial;background:#0f172a;color:#fff;text-align:center;padding:20px;}
-.box{background:#1e293b;padding:25px;border-radius:15px;max-width:400px;margin:20px auto;}
-h1{color:#38bdf8;}
-input{width:90%;padding:12px;margin:8px 0;border-radius:8px;border:none;}
-.btn{background:#22c55e;color:#fff;padding:12px 20px;border:none;border-radius:10px;width:90%;margin:8px 0;font-size:16px;cursor:pointer;}
-.btn2{background:#3b82f6;}
-.btn3{background:#64748b;}
-.whatsapp{background:#25D366;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+body{background:#0f172a;color:white;direction:rtl}
+.header{background:#1e293b;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155}
+.header h1{color:#38bdf8;font-size:26px}
+.header .btn{background:#22c55e;color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold}
+.hero{max-width:1100px;margin:40px auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+.hero h2{font-size:42px;color:#fbbf24;line-height:1.3}
+.hero h2 span{color:#38bdf8}
+.hero p{color:#94a3b8;margin:15px 0;font-size:17px;line-height:1.7}
+.hero .cta{margin-top:20px;display:flex;gap:12px}
+.cta a{padding:14px 22px;border-radius:10px;text-decoration:none;font-weight:bold;display:inline-block}
+.cta .green{background:#22c55e;color:white}
+.cta .blue{background:#334155;color:white;border:1px solid #475569}
+.card{background:#1e293b;border:1px solid #334155;padding:25px;border-radius:16px;text-align:center}
+.card h3{color:#38bdf8;margin-bottom:10px}
+.stats{max-width:1100px;margin:20px auto;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:0 20px}
+.stat-box{background:#1e293b;border:1px solid #334155;padding:20px;border-radius:14px;text-align:center}
+.stat-box h3{color:#22c55e;font-size:28px}
+.ad-box{background:#0b1220;border:1px dashed #38bdf8;border-radius:12px;padding:15px;margin:20px 0;text-align:center;color:#94a3b8;min-height:90px}
+.footer{text-align:center;padding:30px;color:#64748b;border-top:1px solid #1e293b;margin-top:40px}
+@media(max-width:768px){.hero{grid-template-columns:1fr}.stats{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<?php if($page=='home'): ?>
-<div class="box">
-<h1>LaunchX Earning Hub</h1>
-<p>Create Account for User Earning</p>
-<a href="?page=signup"><button class="btn">Create Account for User Earning</button></a>
-<a href="?page=youtube"><button class="btn btn2">Payment for YouTubers</button></a>
-<a href="?page=admin"><button class="btn btn3">Admin Panel</button></a>
-<a href="https://wa.me/923361088011"><button class="btn whatsapp">WhatsApp Support: 0336 1088011</button></a>
+<div class="header">
+  <h1>HDM Earning</h1>
+  <a href="#" class="btn">Login / Signup</a>
 </div>
 
-<?php elseif($page=='signup'): ?>
-<div class="box">
-<h2>Create Account</h2>
-<form method="post">
-<input name="name" placeholder="Enter Your Name" required>
-<input name="email" placeholder="Enter Your Email" required>
-<input name="pass" placeholder="Create Password" required>
-<input name="whatsapp" placeholder="Enter Phone Number" required>
-<button class="btn" name="submit">Submit</button>
-</form>
-<p style="color:orange">Payment: Send Rs.50 to JazzCash: 0336 1088011 - Abdul Rehan</p>
-<p>Phir screenshot WhatsApp per send karo. Approval ke baad Dashboard milega.</p>
-<a href="?page=home"><button class="btn btn3">Back</button></a>
+<div class="hero">
+  <div>
+    <h2>آن لائن کمائیں <span>روزانہ $5 تک</span></h2>
+    <p>HDM ایک قابل اعتماد پلیٹ فارم ہے جہاں آپ چھوٹے ٹاسک اور Ads دیکھ کر ارننگ کر سکتے ہیں۔ 100% فری اور فاسٹ ودڈرا۔</p>
+    <div class="cta">
+      <a href="#" class="green">اکاؤنٹ بنائیں</a>
+      <a href="#" class="blue">مزید جانیں</a>
+    </div>
+
+    <!-- ========== AD CODE 1 یہاں لگائیں ========== -->
+    <div class="ad-box">
+      یہاں آپ کا پہلا Ad Code آئے گا (Banner)
+      <!-- <script>.... آپ کا Adsterra Code 1 ....</script> -->
+    </div>
+
+  </div>
+
+  <div class="card">
+    <h3>آج کی ارننگ</h3>
+    <p style="font-size:48px;font-weight:bold;color:#22c55e;margin:15px 0;">$0.00</p>
+    <p style="color:#94a3b8">شروع کرنے کے لیے Login کریں</p>
+    
+    <!-- ========== AD CODE 2 یہاں لگائیں ========== -->
+    <div class="ad-box">
+      یہاں آپ کا دوسرا Ad Code آئے گا (Social Bar / Native)
+      <!-- <script>.... آپ کا Adsterra Code 2 ....</script> -->
+    </div>
+
+  </div>
 </div>
 
-<?php 
-if(isset($_POST['submit'])){
-  $stmt=$conn->prepare("INSERT INTO users(name,email,pass,whatsapp) VALUES(?,?,?,?)");
-  $stmt->bind_param("ssss",$_POST['name'],$_POST['email'],$_POST['pass'],$_POST['whatsapp']);
-  $stmt->execute();
-  echo "<script>alert('Account bana diya! Ab Rs.50 send karke screenshot WhatsApp karo')</script>";
-}
-?>
-
-<?php elseif($page=='youtube'): ?>
-<div class="box">
-<h2>Payment for YouTubers</h2>
-<p style="color:orange;font-size:20px">RS 50 per Feedback</p>
-<button class="btn">Request Feedback</button>
-<p style="font-size:12px">Admin Panel: Available after Rs 50 payment</p>
-<a href="https://wa.me/923361088011"><button class="btn whatsapp">WhatsApp Support</button></a>
+<div class="stats">
+  <div class="stat-box"><h3>12K+</h3><p>ٹوٹل یوزرز</p></div>
+  <div class="stat-box"><h3>$850+</h3><p>ٹوٹل ودڈرا</p></div>
+  <div class="stat-box"><h3>24/7</h3><p>سپورٹ</p></div>
 </div>
 
-<?php endif; ?>
+<div class="footer">
+  © 2026 HDM Digital - All Rights Reserved
+</div>
+
 </body>
 </html>
